@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getArticles } from "../utils/storage";
+import { getArticles } from "../../utils/storage";
 import ArticleCard from "../components/ArticleCard"
 import { useNavigate } from "react-route-dom";
 

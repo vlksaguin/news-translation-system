@@ -1,9 +1,7 @@
-import { getArticles } from "../utils/storage";
+import { getArticles } from "../../utils/storage";
 
 function Published() {
-    const articles = getArticles().filter(
-        a => a.status === "published"
-    );
+    const articles = JSON.parse(localStorage.getItem("articles")) || [];
 
     return (
         <div>
