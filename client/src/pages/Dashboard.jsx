@@ -1,14 +1,16 @@
+import React from "react";
+
 import { useEffect, useState } from "react";
-import { getArticles } from "../../utils/storage";
+import { getPublished } from "../../utils/storage";
 import ArticleCard from "../components/ArticleCard"
-import { useNavigate } from "react-route-dom";
+import { useNavigate } from "react-router-dom";
 
 function Dashboard(){
-    const [articles, setArticles] = useState([]);
+    const [published, setPublished] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
-        setArticles(getArticles());
+        setPublished(getPublished());
     }, []);
 
     return (
@@ -19,11 +21,11 @@ function Dashboard(){
                 New Article
             </button>
 
-            {articles.map(a => (
+            {published.map(published => (
                 <ArticleCard
-                    key={articles.id}
-                    article={article}
-                    onClick={() => navigate(`/review/${article.id}`)}
+                    key={published.id}
+                    article={published}
+                    onClick={() => navigate(`/review`)}
                     />
             ))}
         </div>

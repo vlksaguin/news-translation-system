@@ -1,10 +1,11 @@
+import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import LoginPage from "./src/pages/LoginPage";
-import Dashboard from "./src/pages/Dashboard";
-import NewArticle from "./src/pages/NewArticle";
-import ReviewArticle from "./src/pages/ReviewArticle";
-import Published from "./src/pages/Published";
+import LoginPage from "./pages/LoginPage";
+import Dashboard from "./pages/Dashboard";
+import NewArticle from "./pages/NewArticle";
+import ReviewArticle from "./pages/ReviewArticle";
+import Published from "./pages/Published";
 
 function App() {
   return (
@@ -13,7 +14,7 @@ function App() {
         <Route path="/" element={<LoginPage />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/new" element={<NewArticle />} />
-        <Route path="/review/:id" element={<ReviewArticle />} />
+        <Route path="/review" element={<ReviewArticle />} />
         <Route path="/published" element={<Published />} />
 
       </Routes>

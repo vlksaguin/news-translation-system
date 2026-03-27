@@ -1,3 +1,5 @@
+import React from "react";
+
 import { getArticles } from "../../utils/storage";
 
 function Published() {

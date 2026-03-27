@@ -3,6 +3,12 @@ export function getArticles() {
     return articles ? JSON.parse(articles) : [];
 }
 
+export function getPublished() {
+    const published = localStorage.getItem("published");
+    console.log(JSON.parse(published));
+    return published ? JSON.parse(published) : [];
+}
+
 export function saveArticles(articles) {
     localStorage.setItem("articles", JSON.stringify(articles));
 }

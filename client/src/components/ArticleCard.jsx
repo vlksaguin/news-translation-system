@@ -1,8 +1,10 @@
+import React from "react";
+
 function ArticleCard( {article, onClick} ) {
     return (
         <div>
-            <h3>{article.title_en}</h3>
-            <p>Status: {article.status}</p>
+            <h3>{article.title}</h3>
+            <p>Language: {article.language}</p>
         </div>
 
     );

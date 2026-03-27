@@ -1,5 +1,7 @@
+import React from "react";
+
 import { useState } from "react";
-import { useNavigate } from "react-route-dom";
+import { useNavigate } from "react-router-dom";
 // import { addArticle } from "../../utils/storage";
 import { translateText } from "../api/api";
 
@@ -12,11 +14,14 @@ function NewArticle(){
     const [body, setBody] = useState("");
     const navigate = useNavigate();
 
-    function handleSubmit(e) {
+    async function handleSubmit(e) {
+        console.log("Inside Handle Submit")
         e.preventDefault();
 
-        const filTitle = translateText(title);
-        const filBody = translateText(body);
+        const filTitle = await translateText(title);
+        console.log(filTitle);
+        const filBody = await translateText(body);
+        console.log(filBody);
 
         const article = {
             id: Date.now().toString(),
@@ -37,7 +42,8 @@ function NewArticle(){
             <h1>New Article</h1>
 
             <form onSubmit={handleSubmit}>
-                <input placeholder="English Title" value={title} onChange={e => setBody(e.target.value)} />
+                <input placeholder="English Title" value={title} onChange={e => setTitle(e.target.value)} 
+                />
                 <textarea
                     placeholder="English Body"
                     value={body}

@@ -2,15 +2,12 @@ const router = require("express").Router();
 const translateToFilipino = require("../services/translationService");
 
 router.post("/translate", async (req, res) => {
-
-    try {
-        const { text } = req.body;
-        const translation = await translateToFilipino(text);
-        res.json({ translation });
-    } catch(error){
-        console.error(error);
-        res.status(500).json({error: "Translation failed"});
-    }
+    const { text } = req.body;
+    console.log("tRoutes: " + text);
+    const translation = await translateToFilipino(text);
+    // const translation = "Fil: " + text;
+    console.log("tRoutes: " + translation);
+    res.json({ translation });
 });
 
 module.exports = router;
