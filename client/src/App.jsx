@@ -15,7 +15,6 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/new" element={<NewArticle />} />
         <Route path="/review" element={<ReviewArticle />} />
-        <Route path="/published" element={<Published />} />
 
       </Routes>
     </Router>
