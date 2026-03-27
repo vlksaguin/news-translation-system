@@ -1,20 +1,4 @@
-const { translate } = require("@vitalets/google-translate-api");
-
 const cache = new Map();
-
-function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function isRateLimitError(error) {
-    const message = String(error && error.message ? error.message : "").toLowerCase();
-    return message.includes("too many requests") || message.includes("429");
-}
-
-async function translateWithGoogle(text) {
-    const result = await translate(text, { to: "tl" });
-    return result.text;
-}
 
 async function translateWithMyMemory(text) {
     const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|tl`;
@@ -44,29 +28,12 @@ async function translateToFilipino(text) {
     }
 
     try {
-        const translated = await translateWithGoogle(text);
+        const translated = await translateWithMyMemory(text);
         cache.set(text, translated);
         return translated;
     } catch (error) {
-        if (isRateLimitError(error)) {
-            try {
-                await sleep(600);
-                const translated = await translateWithGoogle(text);
-                cache.set(text, translated);
-                return translated;
-            } catch (retryError) {
-                console.warn("Google translate throttled, switching provider.");
-            }
-        }
-
-        try {
-            const translated = await translateWithMyMemory(text);
-            cache.set(text, translated);
-            return translated;
-        } catch (fallbackError) {
-            console.error("Translation error:", fallbackError);
-            return text;
-        }
+        console.error("Translation error:", error);
+        return text;
     }
 }
 
