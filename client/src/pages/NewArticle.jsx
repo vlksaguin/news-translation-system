@@ -5,11 +5,11 @@ import { useNavigate } from "react-router-dom";
 // import { addArticle } from "../../utils/storage";
 import { translateText } from "../api/api";
 
-function defaultTranslate(text){
+function defaultTranslate(text) {
     return "FILIPINO VERSION: \n" + text;
 }
 
-function NewArticle(){
+function NewArticle() {
     const [title, setTitle] = useState("");
     const [body, setBody] = useState("");
     const navigate = useNavigate();
@@ -27,8 +27,8 @@ function NewArticle(){
             id: Date.now().toString(),
             title_en: title,
             body_en: body,
-            title_fil:filTitle,
-            body_fil:filBody,
+            title_fil: filTitle,
+            body_fil: filBody,
             status: "review"
         };
 
@@ -38,19 +38,33 @@ function NewArticle(){
     }
 
     return (
-        <div>
-            <h1>New Article</h1>
+        <div className="min-h-screen bg-gray-100">
+            <div className="max-w-3xl mx-auto bg-white p-6 mt-6 shadow">
+                <h1 className="text-2xl font-bold mb-4">New Article</h1>
 
-            <form onSubmit={handleSubmit}>
-                <input placeholder="English Title" value={title} onChange={e => setTitle(e.target.value)} 
-                />
-                <textarea
-                    placeholder="English Body"
-                    value={body}
-                    onChange={e => setBody(e.target.value)}
-                />
-                <button type="submit">Translate</button>
-            </form>
+                <form onSubmit={handleSubmit}>
+                    <input
+                        placeholder="English Title"
+                        value={title}
+                        onChange={e => setTitle(e.target.value)}
+                        className="border p-2 w-full mb-3"
+                    />
+
+                    <textarea
+                        placeholder="English Body"
+                        value={body}
+                        onChange={e => setBody(e.target.value)}
+                        className="border p-2 w-full h-40 mb-3"
+                    />
+
+                    <button
+                        type="submit"
+                        className="bg-purple-700 text-white px-4 py-2"
+                    >
+                        Translate
+                    </button>
+                </form>
+            </div>
         </div>
     );
 }

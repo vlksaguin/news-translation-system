@@ -50,42 +50,52 @@ function ReviewArticle() {
     if (!article) return <div>Loading...</div>;
 
     return (
-        <div>
-            <div>
-                <h2>English</h2>
-                <input
-                    value={article.title_en}
-                    readOnly
-                    style={{ width: "100%" }}
-                />
-                <textarea
-                    value={article.body_en}
-                    readOnly
-                    style={{ width: "100%", height: "300px" }}
-                />
-            </div>
+        <div className="min-h-screen bg-gray-100">
 
-            <div>
-                <h2>Filipino</h2>
-                <input
-                    value={article.title_fil}
-                    onChange={e =>
-                        setArticle({ ...article, title_fil: e.target.value })
-                    }
-                    style={{ width: "100%" }}
-                />
-                <textarea
-                    value={article.body_fil}
-                    onChange={e =>
-                        setArticle({ ...article, body_fil: e.target.value })
-                    }
-                    style={{ width: "100%", height: "300px" }}
-                />
-            </div>
+            <div className="max-w-6xl mx-auto p-6">
+                <div className="grid md:grid-cols-2 gap-6">
+                    {/* English */}
+                    <div className="bg-white p-4 shadow">
+                        <h2 className="font-bold mb-2">English</h2>
+                        <input
+                            value={article.title_en}
+                            readOnly
+                            className="border p-2 w-full mb-2"
+                        />
+                        <textarea
+                            value={article.body_en}
+                            readOnly
+                            className="border p-2 w-full h-64"
+                        />
+                    </div>
 
-            <button onClick={approveArticle}>
-                Approve & Publish
-            </button>
+                    {/* Filipino */}
+                    <div className="bg-white p-4 shadow">
+                        <h2 className="font-bold mb-2">Filipino</h2>
+                        <input
+                            value={article.title_fil}
+                            onChange={e =>
+                                setArticle({ ...article, title_fil: e.target.value })
+                            }
+                            className="border p-2 w-full mb-2"
+                        />
+                        <textarea
+                            value={article.body_fil}
+                            onChange={e =>
+                                setArticle({ ...article, body_fil: e.target.value })
+                            }
+                            className="border p-2 w-full h-64"
+                        />
+                    </div>
+                </div>
+
+                <button
+                    onClick={approveArticle}
+                    className="mt-6 bg-purple-700 text-white px-6 py-2"
+                >
+                    Approve & Publish
+                </button>
+            </div>
         </div>
     );
 }

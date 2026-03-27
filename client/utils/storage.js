@@ -21,7 +21,7 @@ export function addArticle(article) {
 
 export function updateArticle(updatedArticle) {
     const articles = getArticles().map(a =>
-        a.id === updatedArticle.id ? updatedArticle : article
+        a.id === updatedArticle.id ? updatedArticle : articles
     );
     saveArticles(articles);
 }

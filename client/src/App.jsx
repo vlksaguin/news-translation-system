@@ -6,10 +6,12 @@ import Dashboard from "./pages/Dashboard";
 import NewArticle from "./pages/NewArticle";
 import ReviewArticle from "./pages/ReviewArticle";
 import EditArticle from "./pages/EditArticle";
+import Navbar from "./components/Navbar";
 
 function App() {
   return (
     <Router>
+      <Navbar />
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/dashboard" element={<Dashboard />} />
