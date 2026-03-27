@@ -14,7 +14,7 @@ function Navbar() {
           paraluman.
         </div>
 
-        <div className="hidden md:flex gap-6 text-sm">
+        {/* <div className="hidden md:flex gap-6 text-sm">
           <p>Latest News</p>
           <p>Politics</p>
           <p>Business</p>
@@ -22,7 +22,7 @@ function Navbar() {
           <p>Health</p>
           <p>Sports</p>
           <p>Entertainment</p>
-        </div>
+        </div> */}
       </div>
     </div>
   );
