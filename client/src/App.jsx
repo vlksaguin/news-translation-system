@@ -5,7 +5,6 @@ import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
 import NewArticle from "./pages/NewArticle";
 import ReviewArticle from "./pages/ReviewArticle";
-import Published from "./pages/Published";
 
 function App() {
   return (
