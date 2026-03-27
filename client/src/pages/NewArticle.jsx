@@ -15,8 +15,8 @@ function NewArticle(){
     function handleSubmit(e) {
         e.preventDefault();
 
-        const filTitle = await translateText(title);
-        const filBody = await translateText(body);
+        const filTitle = translateText(title);
+        const filBody = translateText(body);
 
         const article = {
             id: Date.now().toString(),

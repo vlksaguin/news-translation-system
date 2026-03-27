@@ -33,7 +33,7 @@ function ReviewArticle() {
                 <textarea
                     value={article.body_en}
                     readOnly
-                    style={{width: "100%", height="300px"}}
+                    style={{width: "100%", height:"300px"}}
                 />
             </div>
 
@@ -51,7 +51,7 @@ function ReviewArticle() {
                     onChange={e =>
                         setArticle({...article, body_fil: e.target.value})
                     }
-                    style={{width: "100%", height="300px"}}
+                    style={{width: "100%", height:"300px"}}
                 />
             </div>
 
