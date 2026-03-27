@@ -22,20 +22,20 @@ function ReviewArticle() {
     function approveArticle() {
         // const article = JSON.parse(localStorage.getItem("articles"));
         const published = JSON.parse(localStorage.getItem("published")) || [];
-        console.log(article.title);
-        console.log(article.filTitle);
+        console.log(article.title_en);
+        console.log(article.title_fil);
         const id = Date.now();
         const englishArticle = {
             id: id + "_engl",
-            title: article.title,
-            body: article.english,
+            title: article.title_en,
+            body: article.body_en,
             language: "EN"
         };
 
         const filipinoArticle = {
             id: id + "_fil",
-            title: article.filTitle,
-            body: article.filBody,
+            title: article.title_fil,
+            body: article.body_fil,
             language: "FIL"
         };
 
