@@ -5,6 +5,7 @@ import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
 import NewArticle from "./pages/NewArticle";
 import ReviewArticle from "./pages/ReviewArticle";
+import EditArticle from "./pages/EditArticle";
 
 function App() {
   return (
@@ -14,7 +15,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/new" element={<NewArticle />} />
         <Route path="/review" element={<ReviewArticle />} />
-
+        <Route path="/edit" element={<EditArticle />} />
       </Routes>
     </Router>
   );

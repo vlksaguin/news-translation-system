@@ -25,7 +25,10 @@ function Dashboard(){
                 <ArticleCard
                     key={published.id}
                     article={published}
-                    onClick={() => navigate(`/review`)}
+                    onClick={() => {
+                        localStorage.setItem("editArticle", JSON.stringify(published));
+                        navigate("/edit");
+                    }}
                     />
             ))}
         </div>
