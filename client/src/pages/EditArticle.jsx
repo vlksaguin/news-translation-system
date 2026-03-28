@@ -8,6 +8,7 @@ import LoadingModal from "../components/LoadingModal";
 
 function EditArticle() {
     const [article, setArticle] = useState("")
+    const [originalArticle, setOriginalArticle] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
     const navigate = useNavigate();
     // const article = getArticles.find(a => a.id === id);
@@ -15,6 +16,7 @@ function EditArticle() {
     useEffect(() => {
         const stored = JSON.parse(localStorage.getItem("editArticle"));
         setArticle(stored);
+        setOriginalArticle(stored);
 
 
     }, []);
@@ -24,8 +26,14 @@ function EditArticle() {
         try {
             const published = JSON.parse(localStorage.getItem("published")) || [];
             const nowIso = new Date().toISOString();
+            const isEdited =
+                article.title !== (originalArticle?.title || "") ||
+                article.body !== (originalArticle?.body || "");
+
             const updatedPublished = published.map(p =>
-                p.id === article.id ? { ...article, editedAt: nowIso } : p
+                p.id === article.id
+                    ? { ...article, editedAt: isEdited ? nowIso : p.editedAt || null }
+                    : p
             );
             localStorage.setItem("published", JSON.stringify(updatedPublished));
             localStorage.removeItem("editArticle");
@@ -33,6 +41,11 @@ function EditArticle() {
         } finally {
             setIsSaving(false);
         }
+    }
+
+    function handleGoBack() {
+        localStorage.removeItem("editArticle");
+        navigate("/dashboard");
     }
 
     if (!article) return <div className="min-h-screen bg-gray-100 p-6">Loading...</div>;
@@ -59,13 +72,22 @@ function EditArticle() {
                     className="border p-2 w-full h-72 mb-3"
                 />
 
-                <button
-                    onClick={saveArticle}
-                    disabled={isSaving}
-                    className="bg-purple-700 text-white px-4 py-2"
-                >
-                    {isSaving ? "Saving..." : "Save Edits to Article"}
-                </button>
+                <div className="flex flex-wrap gap-3">
+                    <button
+                        onClick={handleGoBack}
+                        disabled={isSaving}
+                        className="bg-gray-600 text-white px-4 py-2"
+                    >
+                        Go Back
+                    </button>
+                    <button
+                        onClick={saveArticle}
+                        disabled={isSaving}
+                        className="bg-purple-700 text-white px-4 py-2"
+                    >
+                        {isSaving ? "Saving..." : "Save Edits to Article"}
+                    </button>
+                </div>
             </div>
         </div>
     );
