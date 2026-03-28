@@ -8,6 +8,7 @@
 
 ![Project](https://img.shields.io/badge/Project-Portfolio-0A66C2)
 ![Status](https://img.shields.io/badge/Status-Active-2EA043)
+[![Design Note](https://img.shields.io/badge/Design-Note-6A5ACD)](https://docs.google.com/document/d/1eyvhMnRN5NAKDD2Na_3huSKGH6iG35IKmSS0fJzOIh0/)
 ----
 A full-stack news translation workflow app built with React + Vite on the frontend and Express on the backend.
 
