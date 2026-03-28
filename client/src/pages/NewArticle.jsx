@@ -12,26 +12,42 @@ function NewArticle() {
     const [title, setTitle] = useState("");
     const [body, setBody] = useState("");
     const [isTranslating, setIsTranslating] = useState(false);
+    const [isDraftHydrated, setIsDraftHydrated] = useState(false);
+    const [showDraftRestored, setShowDraftRestored] = useState(false);
     
     const navigate = useNavigate();
     
+    
     useEffect(() => {
+        const storedDraft = JSON.parse(localStorage.getItem(DRAFT_STORAGE_KEY));
+        if (!storedDraft) {
+            setIsDraftHydrated(true);
+            return;
+        }
+
+        const restoredTitle = storedDraft.title || "";
+        const restoredBody = storedDraft.body || "";
+
+        setTitle(restoredTitle);
+        setBody(restoredBody);
+
+        if (restoredTitle || restoredBody) {
+            setShowDraftRestored(true);
+        }
+
+        setIsDraftHydrated(true);
+    }, []);
+
+    useEffect(() => {
+        if (!isDraftHydrated) {
+            return;
+        }
+
         localStorage.setItem(
             DRAFT_STORAGE_KEY,
             JSON.stringify({ title, body })
         );
-    }, [title, body]);
-
-    useEffect(() => {
-        const storedDraft = JSON.parse(localStorage.getItem(DRAFT_STORAGE_KEY));
-        if (!storedDraft) {
-            return;
-        }
-
-        setTitle(storedDraft.title || "");
-        setBody(storedDraft.body || "");
-    }, []);
-
+    }, [title, body, isDraftHydrated]);
 
     async function handleSubmit(e) {
         console.log("Inside Handle Submit")
@@ -74,6 +90,11 @@ function NewArticle() {
             <LoadingModal isOpen={isTranslating} message="Translating content to Filipino..." />
             <div className="max-w-3xl mx-auto bg-white p-6 mt-6 shadow">
                 <h1 className="text-2xl font-bold mb-4">New Article</h1>
+                {showDraftRestored && (
+                    <div className="mb-4 rounded border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800">
+                        Draft restored from your previous edit.
+                    </div>
+                )}
 
                 <form onSubmit={handleSubmit}>
                     <input
