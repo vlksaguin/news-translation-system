@@ -1,20 +1,37 @@
 import React from "react";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 // import { addArticle } from "../../utils/storage";
 import { translateText } from "../api/api";
 import LoadingModal from "../components/LoadingModal";
 
-function defaultTranslate(text) {
-    return "FILIPINO VERSION: \n" + text;
-}
+const DRAFT_STORAGE_KEY = "newArticleDraft";
 
 function NewArticle() {
     const [title, setTitle] = useState("");
     const [body, setBody] = useState("");
     const [isTranslating, setIsTranslating] = useState(false);
+    
     const navigate = useNavigate();
+    
+    useEffect(() => {
+        localStorage.setItem(
+            DRAFT_STORAGE_KEY,
+            JSON.stringify({ title, body })
+        );
+    }, [title, body]);
+
+    useEffect(() => {
+        const storedDraft = JSON.parse(localStorage.getItem(DRAFT_STORAGE_KEY));
+        if (!storedDraft) {
+            return;
+        }
+
+        setTitle(storedDraft.title || "");
+        setBody(storedDraft.body || "");
+    }, []);
+
 
     async function handleSubmit(e) {
         console.log("Inside Handle Submit")
@@ -22,6 +39,11 @@ function NewArticle() {
 
         setIsTranslating(true);
         try {
+            localStorage.setItem(
+                DRAFT_STORAGE_KEY,
+                JSON.stringify({ title, body })
+            );
+
             const filTitle = await translateText(title);
             console.log(filTitle);
             const filBody = await translateText(body);

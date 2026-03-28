@@ -5,11 +5,10 @@ import { useNavigate } from "react-router-dom";
 import LoadingModal from "../components/LoadingModal";
 
 // import { getArticles, updateArticle } from "../../utils/storage";
+const DRAFT_STORAGE_KEY = "newArticleDraft";
 
 function ReviewArticle() {
     const [article, setArticle] = useState("")
-    const [engArticle, setEngArticle] = useState(null)
-    const [filArticle, setFilArticle] = useState(null)
     const [isPublishing, setIsPublishing] = useState(false);
     const navigate = useNavigate();
     // const article = getArticles.find(a => a.id === id);
@@ -47,11 +46,24 @@ function ReviewArticle() {
             published.push(filipinoArticle);
 
             localStorage.setItem("published", JSON.stringify(published));
+            localStorage.removeItem(DRAFT_STORAGE_KEY);
+            localStorage.removeItem("currArticle");
             // console.log("approveArticle Published: " + JSON.stringify(published));
             navigate("/dashboard");
         } finally {
             setIsPublishing(false);
         }
+    }
+
+    function handleGoBack() {
+        localStorage.setItem(
+            DRAFT_STORAGE_KEY,
+            JSON.stringify({
+                title: article.title_en || "",
+                body: article.body_en || ""
+            })
+        );
+        navigate("/new");
     }
 
     if (!article) return <div>Loading...</div>;
@@ -67,13 +79,13 @@ function ReviewArticle() {
                         <h2 className="font-bold mb-2">English</h2>
                         <input
                             value={article.title_en}
-                            disabled="true"
+                            disabled={true}
                             readOnly
                             className="border p-2 w-full mb-2"
                         />
                         <textarea
                             value={article.body_en}
-                            disabled="true"
+                            disabled={true}
                             readOnly
                             className="border p-2 w-full h-64"
                         />
@@ -101,13 +113,22 @@ function ReviewArticle() {
                     </div>
                 </div>
 
-                <button
-                    onClick={approveArticle}
-                    disabled={isPublishing}
-                    className="mt-6 bg-purple-700 text-white px-6 py-2"
-                >
-                    {isPublishing ? "Publishing..." : "Approve & Publish"}
-                </button>
+                <div className="mt-6 flex flex-wrap gap-3">
+                    <button
+                        onClick={handleGoBack}
+                        disabled={isPublishing}
+                        className="bg-gray-600 text-white px-6 py-2"
+                    >
+                        Go Back and Edit English
+                    </button>
+                    <button
+                        onClick={approveArticle}
+                        disabled={isPublishing}
+                        className="bg-purple-700 text-white px-6 py-2"
+                    >
+                        {isPublishing ? "Publishing..." : "Approve & Publish"}
+                    </button>
+                </div>
             </div>
         </div>
     );
