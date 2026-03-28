@@ -53,62 +53,44 @@ Backend:
 From project root, install dependencies for root, client, and server.
 
 1. Install root dependencies
-
+```
 	npm install
-
+```
 2. Install client dependencies
-
+```
 	npm install --prefix client
-
+```
 3. Install server dependencies
-
+```
 	npm install --prefix server
-
+```
 ## Running Locally
 
 Run both frontend and backend together from project root:
-
+```
 npm run dev
-
+```
 This starts:
-- Frontend at http://localhost:5173
-- Backend at http://localhost:5000
+- Frontend at ```http://localhost:5173```
+- Backend at ```http://localhost:5000```
 
 ## Environment Variables
 
 Frontend uses:
 - VITE_API_URL
 
-If not set, frontend falls back to:
-- http://localhost:5000
-
 For production, set VITE_API_URL to your deployed backend URL.
 
 ## Build
 
 Build frontend:
-
+```
 npm run build --prefix client
-
+```
 Run backend in production mode:
-
+```
 npm start --prefix server
-
-## API
-
-POST /api/translate
-
-Request body:
-
-{
-  "text": "Hello world"
-}
-
-Response body:
-
-{
-  "translation": "Kamusta mundo"
-}
+```
 
 ## Deployment (Render)
 
@@ -116,14 +98,14 @@ This repository includes render.yaml for a two-service setup:
 
 1. Web Service (backend)
 - Root directory: server
-- Build command: npm install
-- Start command: npm start
+- Build command: ```npm install```
+- Start command: ```npm start```
 
 2. Static Site (frontend)
 - Root directory: client
-- Build command: npm install && npm run build
-- Publish directory: dist
-- Required env var: VITE_API_URL
+- Build command: ```npm install && npm run build```
+- Publish directory: ```dist```
+- Required env var: ```VITE_API_URL```
 - SPA rewrite: /* -> /index.html
 
 If deploying manually in Render UI, use the same values above.
