@@ -24,19 +24,6 @@ It also tracks metadata per published article:
 - Date published
 - Date last edited
 
-## Table of Contents
-
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Running Locally](#running-locally)
-- [Environment Variables](#environment-variables)
-- [Build](#build)
-- [Deployment (Render)](#deployment-render)
-- [Notes on Translation Provider](#notes-on-translation-provider)
-- [Troubleshooting](#troubleshooting)
-  
 ## Tech Stack
 
 Frontend:
@@ -60,7 +47,7 @@ Backend:
 
 ## Prerequisites
 
-- Node.js 18+
+- Node.js 18+ (until 20 due to TailwindCSS compatibility issues)
 - npm
 
 ## Installation
