@@ -5,9 +5,10 @@
 ![Express](https://img.shields.io/badge/Backend-Express-000000?logo=express&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Runtime-Node.js-339933?logo=nodedotjs&logoColor=white)
 ![Render](https://img.shields.io/badge/Deploy-Render-46E3B7?logo=render&logoColor=111111)
+
 ![Project](https://img.shields.io/badge/Project-Portfolio-0A66C2)
 ![Status](https://img.shields.io/badge/Status-Active-2EA043)
-
+----
 A full-stack news translation workflow app built with React + Vite on the frontend and Express on the backend.
 
 The app lets an editor:
@@ -22,6 +23,19 @@ It also tracks metadata per published article:
 - Date published
 - Date last edited
 
+## Table of Contents
+
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Running Locally](#running-locally)
+- [Environment Variables](#environment-variables)
+- [Build](#build)
+- [Deployment (Render)](#deployment-render)
+- [Notes on Translation Provider](#notes-on-translation-provider)
+- [Troubleshooting](#troubleshooting)
+  
 ## Tech Stack
 
 Frontend:
