@@ -2,6 +2,7 @@ import React from "react";
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import LoadingModal from "../components/LoadingModal";
 
 // import { getArticles, updateArticle } from "../../utils/storage";
 
@@ -9,6 +10,7 @@ function ReviewArticle() {
     const [article, setArticle] = useState("")
     const [engArticle, setEngArticle] = useState(null)
     const [filArticle, setFilArticle] = useState(null)
+    const [isPublishing, setIsPublishing] = useState(false);
     const navigate = useNavigate();
     // const article = getArticles.find(a => a.id === id);
 
@@ -19,38 +21,44 @@ function ReviewArticle() {
 
     }, []);
 
-    function approveArticle() {
-        // const article = JSON.parse(localStorage.getItem("articles"));
-        const published = JSON.parse(localStorage.getItem("published")) || [];
-        console.log(article.title_en);
-        console.log(article.title_fil);
-        const id = Date.now();
-        const englishArticle = {
-            id: id + "_engl",
-            title: article.title_en,
-            body: article.body_en,
-            language: "EN"
-        };
+    async function approveArticle() {
+        setIsPublishing(true);
+        try {
+            // const article = JSON.parse(localStorage.getItem("articles"));
+            const published = JSON.parse(localStorage.getItem("published")) || [];
+            console.log(article.title_en);
+            console.log(article.title_fil);
+            const id = Date.now();
+            const englishArticle = {
+                id: id + "_engl",
+                title: article.title_en,
+                body: article.body_en,
+                language: "EN"
+            };
 
-        const filipinoArticle = {
-            id: id + "_fil",
-            title: article.title_fil,
-            body: article.body_fil,
-            language: "FIL"
-        };
+            const filipinoArticle = {
+                id: id + "_fil",
+                title: article.title_fil,
+                body: article.body_fil,
+                language: "FIL"
+            };
 
-        published.push(englishArticle);
-        published.push(filipinoArticle);
+            published.push(englishArticle);
+            published.push(filipinoArticle);
 
-        localStorage.setItem("published", JSON.stringify(published));
-        // console.log("approveArticle Published: " + JSON.stringify(published));
-        navigate("/dashboard");
+            localStorage.setItem("published", JSON.stringify(published));
+            // console.log("approveArticle Published: " + JSON.stringify(published));
+            navigate("/dashboard");
+        } finally {
+            setIsPublishing(false);
+        }
     }
 
     if (!article) return <div>Loading...</div>;
 
     return (
         <div className="min-h-screen bg-gray-100">
+            <LoadingModal isOpen={isPublishing} message="Publishing approved article..." />
 
             <div className="max-w-6xl mx-auto p-6">
                 <div className="grid md:grid-cols-2 gap-6">
@@ -77,6 +85,7 @@ function ReviewArticle() {
                             onChange={e =>
                                 setArticle({ ...article, title_fil: e.target.value })
                             }
+                            disabled={isPublishing}
                             className="border p-2 w-full mb-2"
                         />
                         <textarea
@@ -84,6 +93,7 @@ function ReviewArticle() {
                             onChange={e =>
                                 setArticle({ ...article, body_fil: e.target.value })
                             }
+                            disabled={isPublishing}
                             className="border p-2 w-full h-64"
                         />
                     </div>
@@ -91,9 +101,10 @@ function ReviewArticle() {
 
                 <button
                     onClick={approveArticle}
+                    disabled={isPublishing}
                     className="mt-6 bg-purple-700 text-white px-6 py-2"
                 >
-                    Approve & Publish
+                    {isPublishing ? "Publishing..." : "Approve & Publish"}
                 </button>
             </div>
         </div>
