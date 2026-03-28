@@ -67,11 +67,13 @@ function ReviewArticle() {
                         <h2 className="font-bold mb-2">English</h2>
                         <input
                             value={article.title_en}
+                            disabled="true"
                             readOnly
                             className="border p-2 w-full mb-2"
                         />
                         <textarea
                             value={article.body_en}
+                            disabled="true"
                             readOnly
                             className="border p-2 w-full h-64"
                         />
