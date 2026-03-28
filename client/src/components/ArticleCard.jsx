@@ -5,10 +5,10 @@ function ArticleCard({ article, onClick }) {
     <div
       className="bg-white shadow-md hover:shadow-xl transition cursor-pointer rounded overflow-hidden"
     >
-      <img
+      {/* <img
         src="https://via.placeholder.com/400x200"
         className="w-full h-40 object-cover"
-      />
+      /> */}
 
       <div className="p-4">
         <h3 className="font-bold text-lg mb-1">{article.title}</h3>
