@@ -11,6 +11,7 @@ const DRAFT_STORAGE_KEY = "newArticleDraft";
 function NewArticle() {
     const [title, setTitle] = useState("");
     const [body, setBody] = useState("");
+    const [author, setAuthor] = useState(() => localStorage.getItem("user") || "");
     const [isTranslating, setIsTranslating] = useState(false);
     const [isDraftHydrated, setIsDraftHydrated] = useState(false);
     const [showDraftRestored, setShowDraftRestored] = useState(false);
@@ -27,11 +28,13 @@ function NewArticle() {
 
         const restoredTitle = storedDraft.title || "";
         const restoredBody = storedDraft.body || "";
+        const restoredAuthor = storedDraft.author || localStorage.getItem("user") || "";
 
         setTitle(restoredTitle);
         setBody(restoredBody);
+        setAuthor(restoredAuthor);
 
-        if (restoredTitle || restoredBody) {
+        if (restoredTitle || restoredBody || restoredAuthor) {
             setShowDraftRestored(true);
         }
 
@@ -45,9 +48,9 @@ function NewArticle() {
 
         localStorage.setItem(
             DRAFT_STORAGE_KEY,
-            JSON.stringify({ title, body })
+            JSON.stringify({ title, body, author })
         );
-    }, [title, body, isDraftHydrated]);
+    }, [title, body, author, isDraftHydrated]);
 
     async function handleSubmit(e) {
         console.log("Inside Handle Submit")
@@ -57,7 +60,7 @@ function NewArticle() {
         try {
             localStorage.setItem(
                 DRAFT_STORAGE_KEY,
-                JSON.stringify({ title, body })
+                JSON.stringify({ title, body, author })
             );
 
             const filTitle = await translateText(title);
@@ -71,6 +74,7 @@ function NewArticle() {
                 body_en: body,
                 title_fil: filTitle,
                 body_fil: filBody,
+                author: author || "Unknown",
                 status: "review"
             };
 
@@ -97,6 +101,14 @@ function NewArticle() {
                 )}
 
                 <form onSubmit={handleSubmit}>
+                    <input
+                        placeholder="Author"
+                        value={author}
+                        onChange={e => setAuthor(e.target.value)}
+                        disabled={isTranslating}
+                        className="border p-2 w-full mb-3"
+                    />
+
                     <input
                         placeholder="English Title"
                         value={title}

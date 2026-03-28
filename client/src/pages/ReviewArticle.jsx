@@ -28,18 +28,26 @@ function ReviewArticle() {
             console.log(article.title_en);
             console.log(article.title_fil);
             const id = Date.now();
+            const publishedAt = new Date().toISOString();
+            const author = article.author || "Unknown";
             const englishArticle = {
                 id: id + "_engl",
                 title: article.title_en,
                 body: article.body_en,
-                language: "EN"
+                language: "EN",
+                author,
+                publishedAt,
+                editedAt: null
             };
 
             const filipinoArticle = {
                 id: id + "_fil",
                 title: article.title_fil,
                 body: article.body_fil,
-                language: "FIL"
+                language: "FIL",
+                author,
+                publishedAt,
+                editedAt: null
             };
 
             published.push(englishArticle);
@@ -60,7 +68,8 @@ function ReviewArticle() {
             DRAFT_STORAGE_KEY,
             JSON.stringify({
                 title: article.title_en || "",
-                body: article.body_en || ""
+                body: article.body_en || "",
+                author: article.author || localStorage.getItem("user") || ""
             })
         );
         navigate("/new");

@@ -23,8 +23,9 @@ function EditArticle() {
         setIsSaving(true);
         try {
             const published = JSON.parse(localStorage.getItem("published")) || [];
+            const nowIso = new Date().toISOString();
             const updatedPublished = published.map(p =>
-                p.id === article.id ? article : p
+                p.id === article.id ? { ...article, editedAt: nowIso } : p
             );
             localStorage.setItem("published", JSON.stringify(updatedPublished));
             localStorage.removeItem("editArticle");
