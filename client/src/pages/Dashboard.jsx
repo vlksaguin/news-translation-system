@@ -102,9 +102,8 @@ function Dashboard() {
       return;
     }
 
-    // If it's published, open for editing
-    localStorage.setItem("editArticle", JSON.stringify(article));
-    navigate("/edit");
+    // Published articles: editing disabled for now
+    // TODO: Implement EditArticle for published articles in a future phase
   }
 
   return (

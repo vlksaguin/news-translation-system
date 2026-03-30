@@ -1,9 +1,9 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { DIALECTS, DIALECT_CODE_TO_LABEL } from "../constants/languages";
-import { PUBLIC_ARTICLES, PUBLIC_LANGUAGE_STORAGE_KEY } from "../data/publicArticles";
 
 const DEFAULT_LANGUAGE = "tl";
+const PUBLIC_LANGUAGE_STORAGE_KEY = "publicSelectedLanguage";
 
 function formatDate(value) {
   const date = new Date(value);
@@ -21,11 +21,60 @@ function PublicArticle() {
     const saved = localStorage.getItem(PUBLIC_LANGUAGE_STORAGE_KEY);
     return saved || DEFAULT_LANGUAGE;
   });
+  const [article, setArticle] = useState(null);
 
-  const article = useMemo(
-    () => PUBLIC_ARTICLES.find((item) => item.id === articleId) || null,
-    [articleId]
-  );
+  useEffect(() => {
+    const published = JSON.parse(localStorage.getItem("published")) || [];
+    
+    // Find all entries for this article
+    const articleEntries = published.filter((p) => {
+      const sourceId = p.sourceArticleId || p.id?.split("_")[0];
+      return sourceId === articleId;
+    });
+
+    if (articleEntries.length === 0) {
+      setArticle(null);
+      return;
+    }
+
+    // Build article structure
+    const englishEntry = articleEntries.find((p) => p.language === "EN" || !p.language);
+    if (!englishEntry) {
+      setArticle(null);
+      return;
+    }
+
+    const translations = {};
+    articleEntries.forEach((entry) => {
+      const languageCode = entry.language?.toLowerCase() || "en";
+      if (languageCode !== "en") {
+        translations[languageCode] = {
+          title: entry.title,
+          body: entry.body,
+        };
+      }
+    });
+
+    setArticle({
+      id: articleId,
+      author: englishEntry.author || "Unknown",
+      publishedAt: englishEntry.publishedAt,
+      category: englishEntry.category || "News",
+      translations,
+    });
+  }, [articleId]);
+
+  const { activeCode, content } = useMemo(() => {
+    if (!article) return { activeCode: DEFAULT_LANGUAGE, content: null };
+
+    const fallbackCode = Object.keys(article.translations)[0];
+    const code = article.translations[selectedLanguage] ? selectedLanguage : fallbackCode;
+
+    return {
+      activeCode: code,
+      content: article.translations[code] || { title: "Untitled", body: "" },
+    };
+  }, [article, selectedLanguage]);
 
   if (!article) {
     return (
@@ -42,12 +91,6 @@ function PublicArticle() {
       </div>
     );
   }
-
-  const fallbackCode = Object.keys(article.translations)[0];
-  const activeCode = article.translations[selectedLanguage]
-    ? selectedLanguage
-    : fallbackCode;
-  const content = article.translations[activeCode];
 
   function handleLanguageChange(nextLanguage) {
     setSelectedLanguage(nextLanguage);
