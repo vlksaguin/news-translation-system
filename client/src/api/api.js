@@ -1,26 +1,31 @@
-// import axios from "axios";
-
-// const API = axios.create({
-//     baseURL: "https://localhost:5000"
-// });
-
-// export const translateText = async (text) => {
-//     const response = await axios.post(`${API}/api/translate`, {
-//         text: text
-//     });
-//     return response.data;
-// }
-
-
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
-export const translateText = async (text) => {
+export const DIALECTS = ["tl", "ceb", "ilo", "hil", "war", "pam"];
+
+export const translateText = async (text, targetLanguage = "tl") => {
+  // response contains src|tgt|translated text after api/translate
   const response = await axios.post(`${API_URL}/api/translate`, {
-    text: text,
+    text,
+    sourceLanguage: "en",
+    targetLanguage,
   });
-  console.log("inside translateText in api.js");
-  console.log(response.data.translation);
+
   return response.data.translation;
+};
+
+export const translateTextBatch = async (text, targetLanguages = DIALECTS) => {
+  const response = await axios.post(`${API_URL}/api/translate/batch`, {
+    text,
+    sourceLanguage: "en",
+    targetLanguages,
+  });
+
+  return response.data.results;
+};
+
+export const getSupportedLanguages = async () => {
+  const response = await axios.get(`${API_URL}/api/translate/languages`);
+  return response.data.languages || [];
 };
