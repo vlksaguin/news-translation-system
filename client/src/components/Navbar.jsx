@@ -14,15 +14,20 @@ function Navbar() {
           paraluman.
         </div>
 
-        {/* <div className="hidden md:flex gap-6 text-sm">
-          <p>Latest News</p>
-          <p>Politics</p>
-          <p>Business</p>
-          <p>Technology</p>
-          <p>Health</p>
-          <p>Sports</p>
-          <p>Entertainment</p>
-        </div> */}
+        <div className="flex gap-2 text-sm">
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="rounded border border-white/40 px-3 py-1 hover:bg-white/10"
+          >
+            Editor
+          </button>
+          <button
+            onClick={() => navigate("/public")}
+            className="rounded border border-white/40 px-3 py-1 hover:bg-white/10"
+          >
+            Public Demo
+          </button>
+        </div>
       </div>
     </div>
   );
