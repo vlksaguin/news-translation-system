@@ -1,79 +1,128 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { translateTextBatch } from "../api/api";
 import LoadingModal from "../components/LoadingModal";
 import { DIALECTS, DIALECT_CODE_TO_LABEL } from "../constants/languages";
 
-const DRAFT_STORAGE_KEY = "newArticleDraft";
-
-/** 
-for adapting old articles
-function normalizeLegacyArticle(stored) {
-  if (!stored) {
-    return null;
+function getStatusColor(reviewStatus) {
+  if (reviewStatus === "approved") {
+    return "bg-emerald-500";
   }
 
-  if (stored.source && stored.translations) {
-    return stored;
+  if (reviewStatus === "changes_requested") {
+    return "bg-amber-500";
   }
 
-  return {
-    id: stored.id || Date.now().toString(),
-    source: {
-      language: "en",
-      title: stored.title_en || "",
-      body: stored.body_en || "",
-    },
-    translations: {
-      tl: {
-        language: "tl",
-        title: stored.title_fil || "",
-        body: stored.body_fil || "",
-        translationStatus: "done",
-        reviewStatus: "needs_review",
-        reviewerName: "",
-        reviewerComment: "",
-        reviewedAt: null,
-      },
-    },
-    author: stored.author || "Unknown",
-    status: stored.status || "review",
-    createdAt: stored.createdAt || new Date().toISOString(),
-  };
-} */
+  return "bg-slate-400";
+}
 
 function ReviewArticle() {
   const [article, setArticle] = useState(null);
   const [selectedLanguage, setSelectedLanguage] = useState("tl");
+  const [isGeneratingTranslations, setIsGeneratingTranslations] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
+  const [validationMessage, setValidationMessage] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Load draft article from articles list
     const stored = JSON.parse(localStorage.getItem("currArticle"));
-    // const normalized = normalizeLegacyArticle(stored);
-    setArticle(stored);
-    
-    const availableCode = Object.keys(stored.translations)[0];
+    if (!stored) {
+      navigate("/dashboard");
+      return;
+    }
+
+    // Set initial status to "for_review" and generate translations
+    const initialArticle = {
+      ...stored,
+      status: "for_review",
+    };
+
+    // If no translations yet, generate them
+    if (!stored.translations || Object.keys(stored.translations).length === 0) {
+      generateTranslations(initialArticle);
+    } else {
+      setArticle(initialArticle);
+      const availableCode = Object.keys(initialArticle.translations)[0];
       if (availableCode) {
         setSelectedLanguage(availableCode);
       }
-    // if (normalized?.translations && !normalized.translations[selectedLanguage]) {
-    //   const availableCode = Object.keys(normalized.translations)[0];
-    //   if (availableCode) {
-    //     setSelectedLanguage(availableCode);
-    //   }
-    // }
+    }
   }, []);
+
+  async function generateTranslations(baseArticle) {
+    setIsGeneratingTranslations(true);
+    try {
+      const targetLanguages = DIALECTS.map((dialect) => dialect.code);
+      const title = baseArticle.source.title;
+      const body = baseArticle.source.body;
+
+      const [titleResults, bodyResults] = await Promise.all([
+        translateTextBatch(title, targetLanguages),
+        translateTextBatch(body, targetLanguages),
+      ]);
+
+      const titleResultMap = Object.fromEntries(
+        titleResults.map((result) => [result.targetLanguage, result])
+      );
+      const bodyResultMap = Object.fromEntries(
+        bodyResults.map((result) => [result.targetLanguage, result])
+      );
+
+      const translations = {};
+      for (const dialect of DIALECTS) {
+        const titleResult = titleResultMap[dialect.code];
+        const bodyResult = bodyResultMap[dialect.code];
+        const isSuccess = Boolean(titleResult?.ok) && Boolean(bodyResult?.ok);
+
+        translations[dialect.code] = {
+          language: dialect.code,
+          title: titleResult?.translation || title,
+          body: bodyResult?.translation || body,
+          translationStatus: isSuccess ? "done" : "failed",
+          reviewStatus: "needs_review",
+          reviewerName: "",
+          reviewerComment: isSuccess ? "" : "Translation failed. Needs manual rewrite.",
+          reviewedAt: null,
+        };
+      }
+
+      const updatedArticle = {
+        ...baseArticle,
+        translations,
+      };
+
+      setArticle(updatedArticle);
+      const availableCode = Object.keys(translations)[0];
+      if (availableCode) {
+        setSelectedLanguage(availableCode);
+      }
+    } catch (error) {
+      console.error("Translation generation failed:", error);
+      setValidationMessage("Failed to generate translations. Please try again.");
+    } finally {
+      setIsGeneratingTranslations(false);
+    }
+  }
 
   const selectedTranslation = useMemo(() => {
     if (!article) {
       return null;
     }
-
     return article.translations?.[selectedLanguage] || null;
   }, [article, selectedLanguage]);
 
-  // switching the currently editable article
+  const allSixApproved = useMemo(() => {
+    if (!article?.translations) {
+      return false;
+    }
+
+    return DIALECTS.every((dialect) => article.translations[dialect.code]?.reviewStatus === "approved");
+  }, [article]);
+
   function updateSelectedTranslation(field, value) {
+    setValidationMessage("");
     setArticle((prev) => ({
       ...prev,
       translations: {
@@ -85,8 +134,9 @@ function ReviewArticle() {
       },
     }));
   }
-  
+
   function updateReviewStatus(nextStatus) {
+    setValidationMessage("");
     const reviewedAt = nextStatus === "approved" ? new Date().toISOString() : null;
     setArticle((prev) => ({
       ...prev,
@@ -101,15 +151,62 @@ function ReviewArticle() {
     }));
   }
 
-  async function approveArticle() {
+  async function saveTranslationEdits() {
     if (!article) {
+      return;
+    }
+
+    setIsSaving(true);
+    setValidationMessage("");
+    try {
+      const articles = JSON.parse(localStorage.getItem("articles")) || [];
+      const updatedArticles = articles.map((storedArticle) => {
+        if (storedArticle.id !== article.id) {
+          return storedArticle;
+        }
+
+        return {
+          ...storedArticle,
+          // Save only translated fields and review statuses; keep source content untouched.
+          translations: article.translations,
+          status: "for_review",
+        };
+      });
+
+      localStorage.setItem("articles", JSON.stringify(updatedArticles));
+      localStorage.setItem("currArticle", JSON.stringify({
+        ...article,
+        status: "for_review",
+      }));
+      setValidationMessage("Translated fields saved.");
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  // Publish only if all languages are approved
+  async function publishArticle() {
+    if (!article) {
+      return;
+    }
+
+    if (!allSixApproved) {
+      setValidationMessage("Approve all 6 dialects before publishing.");
       return;
     }
 
     setIsPublishing(true);
     try {
+      // Get existing articles and published lists
+      const articles = JSON.parse(localStorage.getItem("articles")) || [];
       const published = JSON.parse(localStorage.getItem("published")) || [];
-      const id = Date.now().toString();
+
+      // Remove draft from articles list
+      const updatedArticles = articles.filter((a) => a.id !== article.id);
+      localStorage.setItem("articles", JSON.stringify(updatedArticles));
+
+      // Create published entries
+      const id = article.id;
       const publishedAt = new Date().toISOString();
       const author = article.author || "Unknown";
 
@@ -118,9 +215,12 @@ function ReviewArticle() {
         title: article.source.title,
         body: article.source.body,
         language: "EN",
+        languageLabel: "English",
         author,
         publishedAt,
         editedAt: null,
+        status: "published",
+        sourceArticleId: id,
       };
 
       const translatedArticles = Object.entries(article.translations || {}).map(([code, translation]) => ({
@@ -136,12 +236,16 @@ function ReviewArticle() {
         author,
         publishedAt,
         editedAt: null,
+        status: "published",
+        sourceArticleId: id,
       }));
 
       published.push(englishArticle, ...translatedArticles);
       localStorage.setItem("published", JSON.stringify(published));
-      localStorage.removeItem(DRAFT_STORAGE_KEY);
+
+      // Clean up temporary storage
       localStorage.removeItem("currArticle");
+
       navigate("/dashboard");
     } finally {
       setIsPublishing(false);
@@ -149,27 +253,37 @@ function ReviewArticle() {
   }
 
   function handleGoBack() {
-    localStorage.setItem(
-      DRAFT_STORAGE_KEY,
-      JSON.stringify({
-        title: article?.source?.title || "",
-        body: article?.source?.body || "",
-        author: article?.author || localStorage.getItem("user") || "",
-      })
-    );
-    navigate("/new");
+    setValidationMessage("");
+    localStorage.removeItem("currArticle");
+    navigate("/dashboard");
   }
 
-  if (!article || !selectedTranslation) {
+  if (!article) {
     return <div className="min-h-screen bg-gray-100 p-6">Loading...</div>;
+  }
+
+  if (isGeneratingTranslations) {
+    return <div className="min-h-screen bg-gray-100"><LoadingModal isOpen={true} message="Generating translations for all 6 dialects..." /></div>;
+  }
+
+  if (!selectedTranslation) {
+    return <div className="min-h-screen bg-gray-100 p-6">No translations available. Please try again.</div>;
   }
 
   return (
     <div className="min-h-screen bg-gray-100">
       <LoadingModal isOpen={isPublishing} message="Publishing approved article..." />
 
-    {/* switching which article to edit */}
       <div className="max-w-6xl mx-auto p-6">
+        <h1 className="text-2xl font-bold mb-4">Review Article</h1>
+        <p className="text-sm text-gray-600 mb-4">Status: <span className="font-semibold">For Checking/For Review</span></p>
+
+        {validationMessage && (
+          <div className="mb-4 rounded border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">
+            {validationMessage}
+          </div>
+        )}
+
         <div className="mb-4 flex flex-wrap gap-2">
           {DIALECTS.filter((dialect) => article.translations?.[dialect.code]).map((dialect) => (
             <button
@@ -179,7 +293,14 @@ function ReviewArticle() {
                 selectedLanguage === dialect.code ? "bg-purple-700 text-white" : "bg-white border"
               }`}
             >
-              {dialect.label}
+              <span className="inline-flex items-center gap-2">
+                <span
+                  className={`h-2.5 w-2.5 rounded-full ${getStatusColor(
+                    article.translations[dialect.code].reviewStatus
+                  )}`}
+                />
+                {dialect.label}
+              </span>
             </button>
           ))}
         </div>
@@ -238,15 +359,23 @@ function ReviewArticle() {
         </div>
 
         <div className="mt-6 flex flex-wrap gap-3">
-          <button onClick={handleGoBack} disabled={isPublishing} className="bg-gray-600 text-white px-6 py-2">
-            Go Back and Edit English
+          <button onClick={handleGoBack} disabled={isPublishing || isSaving} className="bg-gray-600 text-white px-6 py-2">
+            Leave as For Review
           </button>
           <button
-            onClick={approveArticle}
-            disabled={isPublishing}
-            className="bg-purple-700 text-white px-6 py-2"
+            onClick={saveTranslationEdits}
+            disabled={isPublishing || isSaving}
+            className="bg-blue-700 text-white px-6 py-2"
           >
-            {isPublishing ? "Publishing..." : "Approve & Publish"}
+            {isSaving ? "Saving..." : "Save Translated Fields"}
+          </button>
+          <button
+            onClick={publishArticle}
+            disabled={isPublishing || isSaving || !allSixApproved}
+            className={`px-6 py-2 text-white ${allSixApproved ? "bg-purple-700" : "bg-purple-300 cursor-not-allowed"}`}
+            title={allSixApproved ? "" : "Approve all 6 dialects to enable publishing"}
+          >
+            {isPublishing ? "Publishing..." : "Publish (if all approved)"}
           </button>
         </div>
       </div>

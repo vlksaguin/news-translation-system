@@ -1,29 +1,32 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { translateText } from "../api/api";
+import { translateTextBatch } from "../api/api";
 import LoadingModal from "../components/LoadingModal";
 import { DIALECTS } from "../constants/languages";
 
 const DRAFT_STORAGE_KEY = "newArticleDraft";
+const DRAFT_META_STORAGE_KEY = "newArticleDraftMeta";
 
 function NewArticle() {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [author, setAuthor] = useState(() => localStorage.getItem("user") || "");
-  const [isTranslating, setIsTranslating] = useState(false);
   const [isDraftHydrated, setIsDraftHydrated] = useState(false);
   const [showDraftRestored, setShowDraftRestored] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [editingDraftId, setEditingDraftId] = useState(null);
   const [translationProgress, setTranslationProgress] = useState({});
 
   const navigate = useNavigate();
 
-  const progressEntries = useMemo(
-    () => DIALECTS.map((dialect) => ({ ...dialect, status: translationProgress[dialect.code] || "pending" })),
-    [translationProgress]
-  );
-
   useEffect(() => {
     const storedDraft = JSON.parse(localStorage.getItem(DRAFT_STORAGE_KEY));
+    const storedMeta = JSON.parse(localStorage.getItem(DRAFT_META_STORAGE_KEY));
+
+    if (storedMeta?.draftId) {
+      setEditingDraftId(storedMeta.draftId);
+    }
+
     if (!storedDraft) {
       setIsDraftHydrated(true);
       return;
@@ -52,79 +55,116 @@ function NewArticle() {
     localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify({ title, body, author }));
   }, [title, body, author, isDraftHydrated]);
 
-  async function translateDialect(languageCode) {
-    setTranslationProgress((prev) => ({ ...prev, [languageCode]: "translating" }));
-
-    try {
-      const translatedTitle = await translateText(title, languageCode);
-      const translatedBody = await translateText(body, languageCode);
-
-      setTranslationProgress((prev) => ({ ...prev, [languageCode]: "done" }));
-
-      return {
-        language: languageCode,
-        title: translatedTitle,
-        body: translatedBody,
-        translationStatus: "done",
-        reviewStatus: "needs_review",
-        reviewerName: "",
-        reviewerComment: "",
-        reviewedAt: null,
-      };
-    } catch (error) {
-      setTranslationProgress((prev) => ({ ...prev, [languageCode]: "failed" }));
-
-      return {
-        language: languageCode,
+  function buildBaseArticle(status = "draft") {
+    return {
+      id: editingDraftId || Date.now().toString(),
+      source: {
+        language: "en",
         title,
         body,
-        translationStatus: "failed",
-        reviewStatus: "needs_review",
-        reviewerName: "",
-        reviewerComment: "Translation failed. Needs manual rewrite.",
-        reviewedAt: null,
-      };
+      },
+      translations: {},
+      author: author || "Unknown",
+      status,
+      createdAt: new Date().toISOString(),
+    };
+  }
+
+  function upsertArticle(article) {
+    const articles = JSON.parse(localStorage.getItem("articles")) || [];
+    const existingIndex = articles.findIndex((item) => item.id === article.id);
+
+    if (existingIndex >= 0) {
+      articles[existingIndex] = article;
+    } else {
+      articles.push(article);
+    }
+
+    localStorage.setItem("articles", JSON.stringify(articles));
+  }
+
+  function handleSaveDraft() {
+    if (!title.trim() || !body.trim()) {
+      alert("Please provide both title and body before saving as draft.");
+      return;
+    }
+
+    try {
+      const draftArticle = buildBaseArticle("draft");
+      upsertArticle(draftArticle);
+      localStorage.removeItem(DRAFT_STORAGE_KEY);
+      localStorage.removeItem(DRAFT_META_STORAGE_KEY);
+      localStorage.removeItem("currArticle");
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Save failed:", error);
+      alert("Failed to save draft. Please try again.");
     }
   }
 
-  async function handleSubmit(e) {
+  async function handleTranslate(e) {
     e.preventDefault();
 
     if (!title.trim() || !body.trim()) {
-      alert("Please provide both title and body before translation.");
+      alert("Please provide both title and body before translating.");
       return;
     }
 
     setIsTranslating(true);
-    setTranslationProgress({});
-
+    setTranslationProgress(
+      Object.fromEntries(DIALECTS.map((dialect) => [dialect.code, "translating"]))
+    );
     try {
-      localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify({ title, body, author }));
+      const baseArticle = buildBaseArticle("for_review");
+      const targetLanguages = DIALECTS.map((dialect) => dialect.code);
+
+      const [titleResults, bodyResults] = await Promise.all([
+        translateTextBatch(title, targetLanguages),
+        translateTextBatch(body, targetLanguages),
+      ]);
+
+      const titleResultMap = Object.fromEntries(
+        titleResults.map((result) => [result.targetLanguage, result])
+      );
+      const bodyResultMap = Object.fromEntries(
+        bodyResults.map((result) => [result.targetLanguage, result])
+      );
 
       const translations = {};
-
+      const nextProgress = {};
       for (const dialect of DIALECTS) {
-        const translated = await translateDialect(dialect.code);
-        translations[dialect.code] = translated;
+        const titleResult = titleResultMap[dialect.code];
+        const bodyResult = bodyResultMap[dialect.code];
+        const isSuccess = Boolean(titleResult?.ok) && Boolean(bodyResult?.ok);
+
+        translations[dialect.code] = {
+          language: dialect.code,
+          title: titleResult?.translation || title,
+          body: bodyResult?.translation || body,
+          translationStatus: isSuccess ? "done" : "failed",
+          reviewStatus: "needs_review",
+          reviewerName: "",
+          reviewerComment: isSuccess ? "" : "Translation failed. Needs manual rewrite.",
+          reviewedAt: null,
+        };
+
+        nextProgress[dialect.code] = isSuccess ? "done" : "failed";
       }
 
-      const article = {
-        id: Date.now().toString(),
-        source: {
-          language: "en",
-          title,
-          body,
-        },
+      setTranslationProgress(nextProgress);
+
+      const translatedArticle = {
+        ...baseArticle,
         translations,
-        author: author || "Unknown",
-        status: "review",
-        createdAt: new Date().toISOString(),
       };
 
-      localStorage.setItem("currArticle", JSON.stringify(article));
+      upsertArticle(translatedArticle);
+      localStorage.setItem("currArticle", JSON.stringify(translatedArticle));
+      localStorage.removeItem(DRAFT_STORAGE_KEY);
+      localStorage.removeItem(DRAFT_META_STORAGE_KEY);
       navigate("/review");
     } catch (error) {
-      console.error("Translation failed:", error);
+      console.error("Translate failed:", error);
       alert("Translation failed. Please try again.");
     } finally {
       setIsTranslating(false);
@@ -142,7 +182,7 @@ function NewArticle() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleTranslate}>
           <input
             placeholder="Author"
             value={author}
@@ -167,18 +207,35 @@ function NewArticle() {
             className="border p-2 w-full h-40 mb-3"
           />
 
-          <button type="submit" disabled={isTranslating} className="bg-purple-700 text-white px-4 py-2">
-            {isTranslating ? "Translating..." : "Translate All Dialects"}
-          </button>
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={handleSaveDraft}
+              disabled={isTranslating}
+              className="bg-gray-700 text-white px-4 py-2"
+            >
+              Save as Draft
+            </button>
+            <button type="submit" disabled={isTranslating} className="bg-purple-700 text-white px-4 py-2">
+              {isTranslating ? "Translating..." : "Translate"}
+            </button>
+          </div>
         </form>
 
-        <div className="mt-6 grid sm:grid-cols-2 gap-2">
-          {progressEntries.map((entry) => (
-            <div key={entry.code} className="border rounded px-3 py-2 text-sm flex justify-between items-center">
-              <span>{entry.label}</span>
-              <span className="font-semibold capitalize">{entry.status.replace("_", " ")}</span>
-            </div>
-          ))}
+        <div className="mt-6 text-sm text-gray-600">
+          <p>Save as Draft stores English only. Translate generates all 6 dialects and opens review.</p>
+        </div>
+
+        <div className="mt-4 grid sm:grid-cols-2 gap-2">
+          {DIALECTS.map((dialect) => {
+            const status = translationProgress[dialect.code] || "pending";
+            return (
+              <div key={dialect.code} className="border rounded px-3 py-2 text-sm flex justify-between items-center">
+                <span>{dialect.label}</span>
+                <span className="font-semibold capitalize">{status.replace("_", " ")}</span>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
