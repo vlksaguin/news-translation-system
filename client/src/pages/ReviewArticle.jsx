@@ -181,6 +181,7 @@ function ReviewArticle() {
       setValidationMessage("Translated fields saved.");
     } finally {
       setIsSaving(false);
+      handleGoBack();
     }
   }
 
@@ -256,6 +257,44 @@ function ReviewArticle() {
     setValidationMessage("");
     localStorage.removeItem("currArticle");
     navigate("/dashboard");
+  }
+
+  function handleEditEnglish() {
+    if (!article) return;
+    
+    setValidationMessage("");
+    // Save article back as draft
+    const articles = JSON.parse(localStorage.getItem("articles")) || [];
+    const draftArticle = {
+      ...article,
+      status: "draft",
+      translations: {}, // Clear translations to start fresh
+    };
+    
+    const updatedArticles = articles.map((a) => (a.id === article.id ? draftArticle : a));
+    if (!articles.find((a) => a.id === article.id)) {
+      updatedArticles.push(draftArticle);
+    }
+    localStorage.setItem("articles", JSON.stringify(updatedArticles));
+    
+    // Preload into new article form
+    const DRAFT_STORAGE_KEY = "newArticleDraft";
+    const DRAFT_META_STORAGE_KEY = "newArticleDraftMeta";
+    
+    localStorage.setItem(
+      DRAFT_STORAGE_KEY,
+      JSON.stringify({
+        title: article.source?.title || "",
+        body: article.source?.body || "",
+        author: article.author || "",
+      })
+    );
+    localStorage.setItem(
+      DRAFT_META_STORAGE_KEY,
+      JSON.stringify({ draftId: article.id })
+    );
+    localStorage.removeItem("currArticle");
+    navigate("/new");
   }
 
   if (!article) {
@@ -359,8 +398,11 @@ function ReviewArticle() {
         </div>
 
         <div className="mt-6 flex flex-wrap gap-3">
-          <button onClick={handleGoBack} disabled={isPublishing || isSaving} className="bg-gray-600 text-white px-6 py-2">
+          {/* <button onClick={handleGoBack} disabled={isPublishing || isSaving} className="bg-gray-600 text-white px-6 py-2">
             Leave as For Review
+          </button> */}
+          <button onClick={handleEditEnglish} disabled={isPublishing || isSaving} className="bg-orange-600 text-white px-6 py-2">
+            Go Back and Edit English
           </button>
           <button
             onClick={saveTranslationEdits}
