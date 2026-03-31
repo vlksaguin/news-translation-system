@@ -5,25 +5,25 @@ function Navbar() {
   const navigate = useNavigate();
 
   return (
-    <div className="bg-purple-700 text-white">
-      <div className="max-w-6xl mx-auto flex justify-between items-center px-4 py-3">
+    <div className="border-b border-purple-900/30 bg-gradient-to-r from-purple-900 via-purple-800 to-fuchsia-800 text-white">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
         <div
-          className="text-2xl font-bold cursor-pointer"
-          onClick={() => navigate("/dashboard")}
+          className="brand-heading cursor-pointer text-3xl font-bold tracking-tight"
+          onClick={() => navigate("/")}
         >
           paraluman.
         </div>
 
-        <div className="flex gap-2 text-sm">
+        <div className="flex gap-2 text-sm font-semibold">
           <button
-            onClick={() => navigate("/dashboard")}
-            className="rounded border border-white/40 px-3 py-1 hover:bg-white/10"
+            onClick={() => navigate("/")}
+            className="rounded-full border border-white/30 px-4 py-1.5 hover:bg-white/15"
           >
             Editor
           </button>
           <button
             onClick={() => navigate("/public")}
-            className="rounded border border-white/40 px-3 py-1 hover:bg-white/10"
+            className="rounded-full border border-white/40 bg-white/10 px-4 py-1.5 hover:bg-white/20"
           >
             Public Demo
           </button>
