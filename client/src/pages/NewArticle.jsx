@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { translateTextBatch } from "../api/api";
+import { translateText } from "../api/api";
 import LoadingModal from "../components/LoadingModal";
 import { DIALECTS } from "../constants/languages";
 
@@ -118,10 +118,43 @@ function NewArticle() {
       const baseArticle = buildBaseArticle("for_review");
       const targetLanguages = DIALECTS.map((dialect) => dialect.code);
 
-      const [titleResults, bodyResults] = await Promise.all([
-        translateTextBatch(title, targetLanguages),
-        translateTextBatch(body, targetLanguages),
-      ]);
+      const titleResults = [];
+      const bodyResults = [];
+      for (const targetLanguage of targetLanguages) {
+        try {
+          const translatedTitle = await translateText(title, targetLanguage);
+          titleResults.push({
+            targetLanguage,
+            ok: true,
+            translation: translatedTitle,
+            error: null,
+          });
+        } catch (error) {
+          titleResults.push({
+            targetLanguage,
+            ok: false,
+            translation: title,
+            error: error?.response?.data?.error || error?.message || "Translation failed",
+          });
+        }
+
+        try {
+          const translatedBody = await translateText(body, targetLanguage);
+          bodyResults.push({
+            targetLanguage,
+            ok: true,
+            translation: translatedBody,
+            error: null,
+          });
+        } catch (error) {
+          bodyResults.push({
+            targetLanguage,
+            ok: false,
+            translation: body,
+            error: error?.response?.data?.error || error?.message || "Translation failed",
+          });
+        }
+      }
 
       const titleResultMap = Object.fromEntries(
         titleResults.map((result) => [result.targetLanguage, result])
