@@ -111,88 +111,65 @@ function NewArticle() {
     }
 
     setIsTranslating(true);
-    setTranslationProgress(
-      Object.fromEntries(DIALECTS.map((dialect) => [dialect.code, "translating"]))
+
+    // Set all to pending initially
+    const initialProgress = Object.fromEntries(
+      DIALECTS.map((d) => [d.code, "pending"])
     );
+    setTranslationProgress(initialProgress);
+
     try {
       const baseArticle = buildBaseArticle("for_review");
-      const targetLanguages = DIALECTS.map((dialect) => dialect.code);
-
-      const titleResults = [];
-      const bodyResults = [];
-      for (const targetLanguage of targetLanguages) {
-        try {
-          const translatedTitle = await translateText(title, targetLanguage);
-          titleResults.push({
-            targetLanguage,
-            ok: true,
-            translation: translatedTitle,
-            error: null,
-          });
-        } catch (error) {
-          titleResults.push({
-            targetLanguage,
-            ok: false,
-            translation: title,
-            error: error?.response?.data?.error || error?.message || "Translation failed",
-          });
-        }
-
-        try {
-          const translatedBody = await translateText(body, targetLanguage);
-          bodyResults.push({
-            targetLanguage,
-            ok: true,
-            translation: translatedBody,
-            error: null,
-          });
-        } catch (error) {
-          bodyResults.push({
-            targetLanguage,
-            ok: false,
-            translation: body,
-            error: error?.response?.data?.error || error?.message || "Translation failed",
-          });
-        }
-      }
-
-      const titleResultMap = Object.fromEntries(
-        titleResults.map((result) => [result.targetLanguage, result])
-      );
-      const bodyResultMap = Object.fromEntries(
-        bodyResults.map((result) => [result.targetLanguage, result])
-      );
-
       const translations = {};
-      const nextProgress = {};
+
       for (const dialect of DIALECTS) {
-        const titleResult = titleResultMap[dialect.code];
-        const bodyResult = bodyResultMap[dialect.code];
-        const isSuccess = Boolean(titleResult?.ok) && Boolean(bodyResult?.ok);
+        // 1. Update status to "translating" for this specific dialect
+        setTranslationProgress(prev => ({ ...prev, [dialect.code]: "translating" }));
 
-        translations[dialect.code] = {
-          language: dialect.code,
-          title: titleResult?.translation || title,
-          body: bodyResult?.translation || body,
-          translationStatus: isSuccess ? "done" : "failed",
-          reviewStatus: "needs_review",
-          reviewerName: "",
-          reviewerComment: isSuccess ? "" : "Translation failed. Needs manual rewrite",
-          reviewedAt: null,
-        };
+        try {
+          // Translate Title and Body
+          const translatedTitle = await translateText(title, dialect.code);
+          const translatedBody = await translateText(body, dialect.code);
 
-        nextProgress[dialect.code] = isSuccess ? "done" : "failed";
+          translations[dialect.code] = {
+            language: dialect.code,
+            title: translatedTitle,
+            body: translatedBody,
+            translationStatus: "done",
+            reviewStatus: "needs_review",
+            reviewerName: "",
+            reviewerComment: "",
+            reviewedAt: null,
+          };
+
+          // 2. Update status to "done"
+          setTranslationProgress(prev => ({ ...prev, [dialect.code]: "done" }));
+        } catch (error) {
+          console.error(`Failed ${dialect.label}:`, error);
+
+          translations[dialect.code] = {
+            language: dialect.code,
+            title,
+            body,
+            translationStatus: "failed",
+            reviewStatus: "needs_review",
+            reviewerName: "",
+            reviewerComment: "Translation failed. Needs manual rewrite",
+            reviewedAt: null,
+          };
+
+          // 3. Update status to "failed"
+          setTranslationProgress(prev => ({ ...prev, [dialect.code]: "failed" }));
+        }
       }
 
-      setTranslationProgress(nextProgress);
-
-      const translatedArticle = {
-        ...baseArticle,
-        translations,
-      };
-
+      const translatedArticle = { ...baseArticle, translations };
       upsertArticle(translatedArticle);
       localStorage.setItem("currArticle", JSON.stringify(translatedArticle));
+
+      // Optional: Add a small delay so the user can see the final "Done" statuses
+      await new Promise(r => setTimeout(r, 1000));
+
       localStorage.removeItem(DRAFT_STORAGE_KEY);
       localStorage.removeItem(DRAFT_META_STORAGE_KEY);
       navigate("/review");
@@ -209,69 +186,88 @@ function NewArticle() {
       <LoadingModal isOpen={isTranslating} message="Translating to 6 Filipino dialects..." />
       <div className="shell py-6">
         <div className="surface mx-auto max-w-4xl p-6 md:p-8">
-        <h1 className="brand-heading mb-2 text-3xl font-bold text-slate-900">Create New Article</h1>
-        <p className="mb-4 text-sm text-slate-600">Draft in English first, then generate six dialect versions for review.</p>
-        {showDraftRestored && (
-          <div className="mb-4 rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
-            Draft restored from your previous edit.
-          </div>
-        )}
+          <h1 className="brand-heading mb-2 text-3xl font-bold text-slate-900">Create New Article</h1>
+          <p className="mb-4 text-sm text-slate-600">Draft in English first, then generate six dialect versions for review.</p>
+          {showDraftRestored && (
+            <div className="mb-4 rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+              Draft restored from your previous edit.
+            </div>
+          )}
 
-        <form onSubmit={handleTranslate}>
-          <input
-            placeholder="Author"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-            disabled={isTranslating}
-            className="field mb-3"
-          />
-
-          <input
-            placeholder="English Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            disabled={isTranslating}
-            className="field mb-3"
-          />
-
-          <textarea
-            placeholder="English Body"
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            disabled={isTranslating}
-            className="field mb-3 h-44"
-          />
-
-          <div className="flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={handleSaveDraft}
+          <form onSubmit={handleTranslate}>
+            <input
+              placeholder="Author"
+              value={author}
+              onChange={(e) => setAuthor(e.target.value)}
               disabled={isTranslating}
-              className="btn-secondary"
-            >
-              Save as Draft
-            </button>
-            <button type="submit" disabled={isTranslating} className="btn-primary">
-              {isTranslating ? "Translating..." : "Translate"}
-            </button>
+              className="field mb-3"
+            />
+
+            <input
+              placeholder="English Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              disabled={isTranslating}
+              className="field mb-3"
+            />
+
+            <textarea
+              placeholder="English Body"
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              disabled={isTranslating}
+              className="field mb-3 h-44"
+            />
+
+            <div className="flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={handleSaveDraft}
+                disabled={isTranslating}
+                className="btn-secondary"
+              >
+                Save as Draft
+              </button>
+              <button type="submit" disabled={isTranslating} className="btn-primary">
+                {isTranslating ? "Translating..." : "Translate"}
+              </button>
+            </div>
+          </form>
+
+          <div className="mt-6 text-sm text-slate-600">
+            <p>Save as Draft stores English only. Translate generates all 6 dialects and opens review.</p>
           </div>
-        </form>
 
-        <div className="mt-6 text-sm text-slate-600">
-          <p>Save as Draft stores English only. Translate generates all 6 dialects and opens review.</p>
-        </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {DIALECTS.map((dialect) => {
+              const status = translationProgress[dialect.code] || "pending";
 
-        <div className="mt-4 grid gap-2 sm:grid-cols-2">
-          {DIALECTS.map((dialect) => {
-            const status = translationProgress[dialect.code] || "pending";
-            return (
-              <div key={dialect.code} className="surface-muted flex items-center justify-between px-3 py-2 text-sm">
-                <span>{dialect.label}</span>
-                <span className="font-semibold capitalize">{status.replace("_", " ")}</span>
-              </div>
-            );
-          })}
-        </div>
+              // Logic for subtle status colors
+              const statusColors = {
+                pending: "text-slate-400",
+                translating: "text-amber-500",
+                done: "text-emerald-600",
+                failed: "text-rose-500"
+              };
+
+              return (
+                <div
+                  key={dialect.code}
+                  className="flex items-center justify-between rounded-md border border-slate-100 bg-slate-50/50 px-3 py-2 text-sm transition-all"
+                >
+                  <span className="font-medium text-slate-700">{dialect.label}</span>
+                  <div className="flex items-center gap-2">
+                    {status === "translating" && (
+                      <span className="h-2 w-2 rounded-full bg-amber-500 animate-ping" />
+                    )}
+                    <span className={`text-xs font-bold uppercase tracking-wider ${statusColors[status]}`}>
+                      {status}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>

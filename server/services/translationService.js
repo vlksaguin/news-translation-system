@@ -1,5 +1,5 @@
 const cache = new Map();
-const MAX_CHARS_PER_REQUEST = 450;
+const MAX_CHARS_PER_REQUEST = 3000;
 const { GoogleGenAI } = require("@google/genai");
 require('dotenv').config({ quiet: true });
 // console.log(process.env.GEMINI_API_KEY);
@@ -37,7 +37,7 @@ function findChunkBreak(text, start, maxChars) {
     return hardEnd;
 }
 
-function splitIntoChunks(text, maxChars = MAX_CHARS_PER_REQUEST) {
+function splitIntoChunks(text, maxChars) {
     const chunks = [];
     let cursor = 0;
 
@@ -76,7 +76,7 @@ async function translateWithMyMemory(text, sourceLang, targetLang) {
 async function translateWithGeminiPrompt(text, sourceLang, targetLang) {
     try {
         const response = await ai.models.generateContent({
-            model: 'gemini-2.0-flash',
+            model: 'gemini-2.5-flash',
             contents: [{
                 role: 'user',
                 parts: [{
@@ -120,8 +120,20 @@ async function translateText({ text, sourceLanguage = "English", targetLanguage 
     }
 
     try {
-        const chunks = splitIntoChunks(text);
-        // will contain translated text chunk by chunk
+        await sleep(10000);
+        // --- STEP 1: Attempt full translation with Gemini ---
+        console.log("Attempting full translation with Gemini...");
+        const translated = await translateWithGeminiPrompt(text, source, target.label);
+        
+        cache.set(cacheKey, translated);
+        return translated;
+
+    } catch (geminiError) {
+        // --- STEP 2: Fallback to Chunked MyMemory ---
+        console.warn("Gemini failed (Quota/Error). Falling back to Chunked MyMemory...");
+        
+        // Use your existing chunking logic specifically for MyMemory's 500-char limit
+        const chunks = splitIntoChunks(text, 450); 
         const translatedParts = [];
 
         for (const chunk of chunks) {
@@ -131,40 +143,24 @@ async function translateText({ text, sourceLanguage = "English", targetLanguage 
             }
 
             const chunkKey = `${source}|${target.myMemoryCode}|${chunk}`;
-            // check if the chunk is in the cache to reduce redundant translations.
             if (cache.has(chunkKey)) {
                 translatedParts.push(cache.get(chunkKey));
                 continue;
             }
-            // await sleep(2000);
-            // translate the chunk and store it in the cache, jic the same chunk appears again
-            let translatedChunk;
-            try {
-                // --- ATTEMPT 1: Gemini ---
-                translatedChunk = await translateWithGeminiPrompt(chunk, source, target.label);
-                console.log("Gemini translated a chunk.");
-            } catch (geminiError) {
-                // --- FALLBACK: MyMemory ---
-                console.warn("Gemini failed, falling back to MyMemory:", geminiError.message);
-                
-                // MyMemory usually prefers ISO codes (like 'en' or 'tl')
-                const sourceCode = source === "english" ? "en" : source; 
-                translatedChunk = await translateWithMyMemory(chunk, sourceCode, target.myMemoryCode);
-            }
-            cache.set(chunkKey, translatedChunk);
 
-            // push to translated array
+            // Small delay to prevent hitting MyMemory's rate limits too
+            await sleep(5000);
+
+            const sourceCode = source === "English" ? "en" : source;
+            const translatedChunk = await translateWithMyMemory(chunk, sourceCode, target.myMemoryCode);
+            
+            cache.set(chunkKey, translatedChunk);
             translatedParts.push(translatedChunk);
         }
 
-        const translated = translatedParts.join("");
-        // update cacheKey -> { src|tgt|src text : translated text }
-        cache.set(cacheKey, translated);
-        // returns translated text
-        return translated;
-    } catch (error) {
-        console.error("Translation error:", error);
-        throw new Error(error.message || "Translation failed");
+        const finalTranslation = translatedParts.join("");
+        cache.set(cacheKey, finalTranslation);
+        return finalTranslation;
     }
 }
 
