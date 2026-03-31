@@ -166,7 +166,7 @@ function PublicHome() {
                       <div>
                         <p className="text-xs font-semibold uppercase tracking-wide text-purple-700">{article.category}</p>
                         <h4 className="mt-1 text-xl font-bold leading-snug text-slate-900">{article.content.title}</h4>
-                        <p className="mt-1 line-clamp-2 text-sm text-slate-600">{article.summary}</p>
+                        <p className="mt-1 line-clamp-2 text-sm text-slate-600">{article.content.summary}</p>
                         <p className="mt-2 text-xs text-slate-500">{article.author} · {formatDate(article.publishedAt)}</p>
                       </div>
                     </button>
