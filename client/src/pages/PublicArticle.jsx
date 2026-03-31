@@ -108,7 +108,7 @@ function PublicArticle() {
               <p className="mb-5 text-sm text-slate-500">
                 {article.author} · {formatDate(article.publishedAt)} · {DIALECT_CODE_TO_LABEL[activeCode]}
               </p>
-              <p className="mb-6 text-lg font-semibold text-slate-700">{article.content.summary}</p>
+              <p className="mb-6 text-lg font-semibold text-slate-700">{content.summary}</p>
               <p className="text-xl leading-9 text-slate-800 whitespace-pre-wrap">{content.body}</p>
             </div>
           </article>
