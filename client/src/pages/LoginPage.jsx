@@ -19,39 +19,59 @@ function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="page-enter min-h-screen bg-transparent px-4 py-12">
       <LoadingModal isOpen={isLoggingIn} message="Signing you in..." />
-      <form
-        onSubmit={handleLogin}
-        className="bg-white p-8 shadow-md w-80"
-      >
-        <h1 className="text-2xl font-bold mb-4 text-center">
-          paraluman.
-        </h1>
+      <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+        <section className="news-hero p-7 md:p-10">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-purple-700">Editorial Control Center</p>
+          <h1 className="brand-heading mb-4 text-4xl font-bold text-slate-900">Paraluman News Translation Desk</h1>
+          <p className="max-w-2xl text-base text-slate-700">
+            Prepare source stories, coordinate multilingual reviews, and publish reader-ready coverage with a newsroom workflow inspired by modern media dashboards.
+          </p>
+          <div className="mt-6 grid gap-3 sm:grid-cols-3">
+            <div className="surface-muted p-3">
+              <p className="text-xs uppercase text-slate-500">Workflow</p>
+              <p className="font-semibold text-slate-900">Draft to Publish</p>
+            </div>
+            <div className="surface-muted p-3">
+              <p className="text-xs uppercase text-slate-500">Coverage</p>
+              <p className="font-semibold text-slate-900">6 Dialects</p>
+            </div>
+            <div className="surface-muted p-3">
+              <p className="text-xs uppercase text-slate-500">Reader Site</p>
+              <p className="font-semibold text-slate-900">Public Demo</p>
+            </div>
+          </div>
+        </section>
 
-        <input
-          placeholder="Username"
-          className="border p-2 w-full mb-3"
-          disabled={isLoggingIn}
-          required
-        />
+        <form onSubmit={handleLogin} className="surface p-7 md:p-8">
+          <h2 className="brand-heading mb-1 text-2xl font-bold text-purple-900">Editor Sign In</h2>
+          <p className="mb-5 text-sm text-slate-600">Validation is coming next phase. Use any credentials for now.</p>
 
-        <input
-          placeholder="Password"
-          type="password"
-          className="border p-2 w-full mb-4"
-          disabled={isLoggingIn}
-          required
-        />
+          <input
+            placeholder="Username"
+            className="field mb-3"
+            disabled={isLoggingIn}
+            required
+          />
 
-        <button
-          type="submit"
-          disabled={isLoggingIn}
-          className="bg-purple-700 text-white w-full py-2"
-        >
-          {isLoggingIn ? "Logging in..." : "Login"}
-        </button>
-      </form>
+          <input
+            placeholder="Password"
+            type="password"
+            className="field mb-5"
+            disabled={isLoggingIn}
+            required
+          />
+
+          <button
+            type="submit"
+            disabled={isLoggingIn}
+            className="btn-primary w-full py-2.5"
+          >
+            {isLoggingIn ? "Logging in..." : "Enter Editorial Desk"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
