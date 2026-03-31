@@ -205,12 +205,14 @@ function NewArticle() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="page-enter min-h-screen bg-transparent">
       <LoadingModal isOpen={isTranslating} message="Translating to 6 Filipino dialects..." />
-      <div className="max-w-3xl mx-auto bg-white p-6 mt-6 shadow">
-        <h1 className="text-2xl font-bold mb-4">New Article</h1>
+      <div className="shell py-6">
+        <div className="surface mx-auto max-w-4xl p-6 md:p-8">
+        <h1 className="brand-heading mb-2 text-3xl font-bold text-slate-900">Create New Article</h1>
+        <p className="mb-4 text-sm text-slate-600">Draft in English first, then generate six dialect versions for review.</p>
         {showDraftRestored && (
-          <div className="mb-4 rounded border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800">
+          <div className="mb-4 rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
             Draft restored from your previous edit.
           </div>
         )}
@@ -221,7 +223,7 @@ function NewArticle() {
             value={author}
             onChange={(e) => setAuthor(e.target.value)}
             disabled={isTranslating}
-            className="border p-2 w-full mb-3"
+            className="field mb-3"
           />
 
           <input
@@ -229,7 +231,7 @@ function NewArticle() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             disabled={isTranslating}
-            className="border p-2 w-full mb-3"
+            className="field mb-3"
           />
 
           <textarea
@@ -237,7 +239,7 @@ function NewArticle() {
             value={body}
             onChange={(e) => setBody(e.target.value)}
             disabled={isTranslating}
-            className="border p-2 w-full h-40 mb-3"
+            className="field mb-3 h-44"
           />
 
           <div className="flex flex-wrap gap-3">
@@ -245,30 +247,31 @@ function NewArticle() {
               type="button"
               onClick={handleSaveDraft}
               disabled={isTranslating}
-              className="bg-gray-700 text-white px-4 py-2"
+              className="btn-secondary"
             >
               Save as Draft
             </button>
-            <button type="submit" disabled={isTranslating} className="bg-purple-700 text-white px-4 py-2">
+            <button type="submit" disabled={isTranslating} className="btn-primary">
               {isTranslating ? "Translating..." : "Translate"}
             </button>
           </div>
         </form>
 
-        <div className="mt-6 text-sm text-gray-600">
+        <div className="mt-6 text-sm text-slate-600">
           <p>Save as Draft stores English only. Translate generates all 6 dialects and opens review.</p>
         </div>
 
-        <div className="mt-4 grid sm:grid-cols-2 gap-2">
+        <div className="mt-4 grid gap-2 sm:grid-cols-2">
           {DIALECTS.map((dialect) => {
             const status = translationProgress[dialect.code] || "pending";
             return (
-              <div key={dialect.code} className="border rounded px-3 py-2 text-sm flex justify-between items-center">
+              <div key={dialect.code} className="surface-muted flex items-center justify-between px-3 py-2 text-sm">
                 <span>{dialect.label}</span>
                 <span className="font-semibold capitalize">{status.replace("_", " ")}</span>
               </div>
             );
           })}
+        </div>
         </div>
       </div>
     </div>

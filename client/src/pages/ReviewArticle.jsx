@@ -331,27 +331,29 @@ function ReviewArticle() {
   }
 
   if (!article) {
-    return <div className="min-h-screen bg-gray-100 p-6">Loading...</div>;
+    return <div className="page-enter min-h-screen bg-transparent p-6">Loading...</div>;
   }
 
   if (isGeneratingTranslations) {
-    return <div className="min-h-screen bg-gray-100"><LoadingModal isOpen={true} message="Generating translations for all 6 dialects..." /></div>;
+    return <div className="page-enter min-h-screen bg-transparent"><LoadingModal isOpen={true} message="Generating translations for all 6 dialects..." /></div>;
   }
 
   if (!selectedTranslation) {
-    return <div className="min-h-screen bg-gray-100 p-6">No translations available. Please try again.</div>;
+    return <div className="page-enter min-h-screen bg-transparent p-6">No translations available. Please try again.</div>;
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="page-enter min-h-screen bg-transparent">
       <LoadingModal isOpen={isPublishing} message="Publishing approved article..." />
 
-      <div className="max-w-6xl mx-auto p-6">
-        <h1 className="text-2xl font-bold mb-4">Review Article</h1>
-        <p className="text-sm text-gray-600 mb-4">Status: <span className="font-semibold">For Checking/For Review</span></p>
+      <div className="shell py-6">
+        <section className="news-hero mb-5 p-6">
+          <h1 className="brand-heading mb-2 text-3xl font-bold text-slate-900">Review Translations</h1>
+          <p className="text-sm text-slate-600">Status: <span className="font-semibold text-purple-800">For Checking / For Review</span></p>
+        </section>
 
         {validationMessage && (
-          <div className="mb-4 rounded border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">
+          <div className="mb-4 rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">
             {validationMessage}
           </div>
         )}
@@ -361,8 +363,8 @@ function ReviewArticle() {
             <button
               key={dialect.code}
               onClick={() => setSelectedLanguage(dialect.code)}
-              className={`px-3 py-2 text-sm rounded ${
-                selectedLanguage === dialect.code ? "bg-purple-700 text-white" : "bg-white border"
+              className={`chip ${
+                selectedLanguage === dialect.code ? "chip-active" : ""
               }`}
             >
               <span className="inline-flex items-center gap-2">
@@ -377,26 +379,26 @@ function ReviewArticle() {
           ))}
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-white p-4 shadow">
-            <h2 className="font-bold mb-2">English Source</h2>
-            <input value={article.source.title} disabled readOnly className="border p-2 w-full mb-2" />
-            <textarea value={article.source.body} disabled readOnly className="border p-2 w-full h-64" />
+        <div className="grid gap-6 md:grid-cols-2">
+          <div className="surface p-4">
+            <h2 className="brand-heading mb-2 text-2xl font-bold text-slate-900">English Source</h2>
+            <input value={article.source.title} disabled readOnly className="field mb-2" />
+            <textarea value={article.source.body} disabled readOnly className="field h-64" />
           </div>
 
-          <div className="bg-white p-4 shadow">
-            <h2 className="font-bold mb-2">{DIALECT_CODE_TO_LABEL[selectedLanguage]} Review</h2>
+          <div className="surface p-4">
+            <h2 className="brand-heading mb-2 text-2xl font-bold text-slate-900">{DIALECT_CODE_TO_LABEL[selectedLanguage]} Review</h2>
             <input
               value={selectedTranslation.title}
               onChange={(e) => updateSelectedTranslation("title", e.target.value)}
               disabled={isPublishing}
-              className="border p-2 w-full mb-2"
+              className="field mb-2"
             />
             <textarea
               value={selectedTranslation.body}
               onChange={(e) => updateSelectedTranslation("body", e.target.value)}
               disabled={isPublishing}
-              className="border p-2 w-full h-40 mb-3"
+              className="field mb-3 h-40"
             />
 
             <div className="grid sm:grid-cols-2 gap-2 mb-2">
@@ -404,7 +406,7 @@ function ReviewArticle() {
                 value={selectedTranslation.reviewStatus || "needs_review"}
                 onChange={(e) => updateReviewStatus(e.target.value)}
                 disabled={isPublishing}
-                className="border p-2"
+                className="field"
               >
                 <option value="needs_review">Needs Review</option>
                 <option value="approved">Approved</option>
@@ -416,7 +418,7 @@ function ReviewArticle() {
                 onChange={(e) => updateSelectedTranslation("reviewerName", e.target.value)}
                 disabled={isPublishing}
                 placeholder="Reviewer name"
-                className="border p-2"
+                className="field"
               />
             </div>
 
@@ -425,7 +427,7 @@ function ReviewArticle() {
               onChange={(e) => updateSelectedTranslation("reviewerComment", e.target.value)}
               disabled={isPublishing}
               placeholder="Reviewer comment"
-              className="border p-2 w-full h-20"
+              className="field h-20"
             />
           </div>
         </div>
@@ -434,20 +436,20 @@ function ReviewArticle() {
           {/* <button onClick={handleGoBack} disabled={isPublishing || isSaving} className="bg-gray-600 text-white px-6 py-2">
             Leave as For Review
           </button> */}
-          <button onClick={handleEditEnglish} disabled={isPublishing || isSaving} className="bg-orange-600 text-white px-6 py-2">
+          <button onClick={handleEditEnglish} disabled={isPublishing || isSaving} className="btn-secondary">
             Go Back and Edit English
           </button>
           <button
             onClick={saveTranslationEdits}
             disabled={isPublishing || isSaving}
-            className="bg-blue-700 text-white px-6 py-2"
+            className="btn-secondary"
           >
             {isSaving ? "Saving..." : "Save Translated Fields"}
           </button>
           <button
             onClick={publishArticle}
             disabled={isPublishing || isSaving || !allSixApproved}
-            className={`px-6 py-2 text-white ${allSixApproved ? "bg-purple-700" : "bg-purple-300 cursor-not-allowed"}`}
+            className={`btn-primary ${allSixApproved ? "" : "cursor-not-allowed opacity-60"}`}
             title={allSixApproved ? "" : "Approve all 6 dialects to enable publishing"}
           >
             {isPublishing ? "Publishing..." : "Publish (if all approved)"}
