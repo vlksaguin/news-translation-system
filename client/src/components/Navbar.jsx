@@ -9,7 +9,7 @@ function Navbar() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
         <div
           className="brand-heading cursor-pointer text-3xl font-bold tracking-tight"
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/public")}
         >
           paraluman.
         </div>
@@ -21,12 +21,12 @@ function Navbar() {
           >
             Editor
           </button>
-          <button
+          {/* <button
             onClick={() => navigate("/public")}
             className="rounded-full border border-white/40 bg-white/10 px-4 py-1.5 hover:bg-white/20"
           >
             Public Demo
-          </button>
+          </button> */}
         </div>
       </div>
     </div>
