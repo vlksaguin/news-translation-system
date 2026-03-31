@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require("cors");
 const translationRoutes = require("./routes/translationRoutes");
+require('dotenv').config({ quiet: true });
 
 const app = express();
 const PORT = process.env.PORT || 5000;

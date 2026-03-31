@@ -1,9 +1,12 @@
 const cache = new Map();
 const MAX_CHARS_PER_REQUEST = 450;
-import { GoogleGenerativeAI } from "@google/generative-ai";
+const { GoogleGenAI } = require("@google/genai");
+require('dotenv').config({ quiet: true });
+// console.log(process.env.GEMINI_API_KEY);
 
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({model: "gemini-1.5-flash"});
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 const SUPPORTED_LANGUAGES = {
     tl: { label: "Tagalog", myMemoryCode: "tl" },
@@ -72,18 +75,24 @@ async function translateWithMyMemory(text, sourceLang, targetLang) {
 
 async function translateWithGeminiPrompt(text, sourceLang, targetLang) {
     try {
-        const prompt = `Translate the following ${sourceLang} text to ${targetLang.label}. 
-                        Provide ONLY the translated text without quotes or explanations: 
-                        "${text}"`;
-        const result = await model.generateContent(prompt);
-        const response = result.text().trim();
-        const translatedText = response.text().trim();
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.0-flash',
+            contents: [{
+                role: 'user',
+                parts: [{
+                    text: `You are a Philippine Dialect Expert, knowledgable about the different grammar rules and vocabulary of various Philippine Dialects.
+                    Translate the following ${sourceLang} text to ${targetLang}. Provide ONLY the translated text, with no other explanations: "${text}"`
+                }]
+            }]
+        });
+
+        const translatedText = response.text;
 
         if (!translatedText) {
             throw new Error("Gemini returned empty translation");
         }
 
-        return translateText;
+        return translatedText;
     } catch (error) {
         console.error("Gemini Error: ", error.message);
         throw new Error(`Gemini Failed: ${error.message}`);
@@ -100,7 +109,8 @@ async function translateText({ text, sourceLanguage = "English", targetLanguage 
         throw new Error(`Unsupported language: ${targetLanguage}`);
     }
 
-    const source = String(sourceLanguage || "en").trim().toLowerCase();
+    // const source = String(sourceLanguage || "en").trim().toLowerCase(); --> for MyMemory since codes ang basis
+    const source = String(sourceLanguage || "English").trim().toLowerCase();
     // remembers this specific text and translation to reduce redundancy
     const cacheKey = `${source}|${target.myMemoryCode}|${text}`;
 
@@ -126,8 +136,21 @@ async function translateText({ text, sourceLanguage = "English", targetLanguage 
                 translatedParts.push(cache.get(chunkKey));
                 continue;
             }
+            // await sleep(2000);
             // translate the chunk and store it in the cache, jic the same chunk appears again
-            const translatedChunk = await translateWithGeminiPrompt(chunk, source, target.label);
+            let translatedChunk;
+            try {
+                // --- ATTEMPT 1: Gemini ---
+                translatedChunk = await translateWithGeminiPrompt(chunk, source, target.label);
+                console.log("Gemini translated a chunk.");
+            } catch (geminiError) {
+                // --- FALLBACK: MyMemory ---
+                console.warn("Gemini failed, falling back to MyMemory:", geminiError.message);
+                
+                // MyMemory usually prefers ISO codes (like 'en' or 'tl')
+                const sourceCode = source === "english" ? "en" : source; 
+                translatedChunk = await translateWithMyMemory(chunk, sourceCode, target.myMemoryCode);
+            }
             cache.set(chunkKey, translatedChunk);
 
             // push to translated array
