@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { DIALECTS, DIALECT_CODE_TO_LABEL } from "../constants/languages";
 import { PUBLIC_ARTICLES, PUBLIC_LANGUAGE_STORAGE_KEY } from "../data/publicArticles";
 
-const DEFAULT_LANGUAGE = "tl";
+const DEFAULT_LANGUAGE = "en";
 
 function formatDate(value) {
   const date = new Date(value);
@@ -21,7 +21,9 @@ function PublicArticle() {
     const saved = localStorage.getItem(PUBLIC_LANGUAGE_STORAGE_KEY);
     return saved || DEFAULT_LANGUAGE;
   });
-  const [article, setArticle] = useState(() => PUBLIC_ARTICLES.find((item) => item.id === articleId) || null);
+  const [article, setArticle] = useState(() => 
+    PUBLIC_ARTICLES.find((item) => item.id === articleId) || null
+  );
 
   useEffect(() => {
     setArticle(PUBLIC_ARTICLES.find((item) => item.id === articleId) || null);
@@ -106,7 +108,7 @@ function PublicArticle() {
               <p className="mb-5 text-sm text-slate-500">
                 {article.author} · {formatDate(article.publishedAt)} · {DIALECT_CODE_TO_LABEL[activeCode]}
               </p>
-              <p className="mb-6 text-lg font-semibold text-slate-700">{article.summary}</p>
+              <p className="mb-6 text-lg font-semibold text-slate-700">{article.content.summary}</p>
               <p className="text-xl leading-9 text-slate-800 whitespace-pre-wrap">{content.body}</p>
             </div>
           </article>
