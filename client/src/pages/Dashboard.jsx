@@ -1,7 +1,9 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import ArticleCard from "../components/ArticleCard";
 import { useNavigate } from "react-router-dom";
+import ArticleCard from "../components/ArticleCard";
+import DashSummary from "../components/DashHero";
+
 
 const DRAFT_STORAGE_KEY = "newArticleDraft";
 const DRAFT_META_STORAGE_KEY = "newArticleDraftMeta";
@@ -107,44 +109,42 @@ function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="max-w-6xl mx-auto p-6">
-        <div className="flex justify-between mb-6">
-          <h1 className="text-2xl font-bold">Dashboard</h1>
+    <div className="page-enter min-h-screen bg-transparent">
+      <div className="shell py-6">
+        {/* hero section */}
+        <DashSummary 
+          counts={counts}
+        />
 
-          <button
-            onClick={() => navigate("/new")}
-            className="bg-purple-700 text-white px-4 py-2 rounded"
-          >
-            New Article
-          </button>
-        </div>
-
-        <div className="mb-6 flex flex-wrap gap-2">
+        <div className="mb-5 flex flex-wrap gap-2">
           {STATUS_FILTERS.map((filter) => (
             <button
               key={filter.key}
               onClick={() => setActiveFilter(filter.key)}
-              className={`rounded-full px-4 py-2 text-sm ${
-                activeFilter === filter.key ? "bg-purple-700 text-white" : "bg-white border"
-              }`}
+              className={`chip ${activeFilter === filter.key ? "chip-active" : ""}`}
             >
               {filter.label} ({counts[filter.key]})
             </button>
           ))}
         </div>
 
-        {/* Article Grid */}
-        <div className="grid md:grid-cols-3 gap-6">
-          {filtered.map((article) => (
-            <ArticleCard
-              key={article.id}
-              article={article}
-              status={article.dashboardStatus}
-              onClick={() => handleCardClick(article)}
-            />
-          ))}
-        </div>
+        {filtered.length === 0 ? (
+            <div className="surface p-10 text-center">
+              <h2 className="brand-heading text-2xl font-bold text-slate-900">No Articles In This View</h2>
+              <p className="mt-2 text-slate-600">Create a new story or switch your filter to view existing records.</p>
+            </div>
+          ) : (
+            <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+              {filtered.map((article) => (
+                <ArticleCard
+                  key={article.id}
+                  article={article}
+                  status={article.dashboardStatus}
+                  onClick={() => handleCardClick(article)}
+                />
+              ))}
+            </div>
+        )}
       </div>
     </div>
   );
