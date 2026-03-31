@@ -151,7 +151,7 @@ function EditArticle() {
           translationStatus: isSuccess ? "done" : "failed",
           reviewStatus: "needs_review",
           reviewerName: "",
-          reviewerComment: isSuccess ? "" : "Retranslated due to English changes.",
+          reviewerComment: isSuccess ? "" : "Translation failed. Needs manual rewrite",
           reviewedAt: null,
         };
       }
@@ -272,7 +272,7 @@ function EditArticle() {
           translationStatus: isSuccess ? "done" : "failed",
           reviewStatus: "needs_review",
           reviewerName: "",
-          reviewerComment: isSuccess ? "" : "Retranslated due to English changes.",
+          reviewerComment: isSuccess ? "" : "Retranslation failed. Needs manual rewrite",
           reviewedAt: null,
         };
       }

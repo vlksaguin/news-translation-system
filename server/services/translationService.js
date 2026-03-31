@@ -117,7 +117,7 @@ async function translateText({ text, sourceLanguage = "en", targetLanguage }) {
         return translated;
     } catch (error) {
         console.error("Translation error:", error);
-        return text;
+        throw new Error(error.message || "Translation failed");
     }
 }
 

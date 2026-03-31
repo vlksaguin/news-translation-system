@@ -116,7 +116,7 @@ function ReviewArticle() {
           translationStatus: isSuccess ? "done" : "failed",
           reviewStatus: "needs_review",
           reviewerName: "",
-          reviewerComment: isSuccess ? "" : "Translation failed. Needs manual rewrite.",
+          reviewerComment: isSuccess ? "" : "Translation failed. Needs manual rewrite",
           reviewedAt: null,
         };
       }
