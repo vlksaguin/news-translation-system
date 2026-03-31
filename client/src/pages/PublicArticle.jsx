@@ -1,9 +1,9 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { DIALECTS, DIALECT_CODE_TO_LABEL } from "../constants/languages";
+import { PUBLIC_ARTICLES, PUBLIC_LANGUAGE_STORAGE_KEY } from "../data/publicArticles";
 
 const DEFAULT_LANGUAGE = "tl";
-const PUBLIC_LANGUAGE_STORAGE_KEY = "publicSelectedLanguage";
 
 function formatDate(value) {
   const date = new Date(value);
@@ -21,48 +21,16 @@ function PublicArticle() {
     const saved = localStorage.getItem(PUBLIC_LANGUAGE_STORAGE_KEY);
     return saved || DEFAULT_LANGUAGE;
   });
-  const [article, setArticle] = useState(null);
+  const [article, setArticle] = useState(() => PUBLIC_ARTICLES.find((item) => item.id === articleId) || null);
 
   useEffect(() => {
-    const published = JSON.parse(localStorage.getItem("published")) || [];
-    
-    // Find all entries for this article
-    const articleEntries = published.filter((p) => {
-      const sourceId = p.sourceArticleId || p.id?.split("_")[0];
-      return sourceId === articleId;
-    });
-
-    if (articleEntries.length === 0) {
-      setArticle(null);
-      return;
-    }
-
-    // Build article structure
-    const englishEntry = articleEntries.find((p) => p.language === "EN" || !p.language);
-    if (!englishEntry) {
-      setArticle(null);
-      return;
-    }
-
-    const translations = {};
-    articleEntries.forEach((entry) => {
-      const languageCode = entry.language?.toLowerCase() || "en";
-      if (languageCode !== "en") {
-        translations[languageCode] = {
-          title: entry.title,
-          body: entry.body,
-        };
-      }
-    });
-
-    setArticle({
-      id: articleId,
-      author: englishEntry.author || "Unknown",
-      publishedAt: englishEntry.publishedAt,
-      category: englishEntry.category || "News",
-      translations,
-    });
+    setArticle(PUBLIC_ARTICLES.find((item) => item.id === articleId) || null);
   }, [articleId]);
+
+  const relatedStories = useMemo(
+    () => PUBLIC_ARTICLES.filter((item) => item.id !== articleId).slice(0, 4),
+    [articleId]
+  );
 
   const { activeCode, content } = useMemo(() => {
     if (!article) return { activeCode: DEFAULT_LANGUAGE, content: null };
@@ -78,12 +46,12 @@ function PublicArticle() {
 
   if (!article) {
     return (
-      <div className="min-h-screen bg-slate-100 p-8">
-        <div className="max-w-3xl mx-auto bg-white border rounded-xl p-6">
-          <h1 className="text-xl font-semibold">Article not found.</h1>
+      <div className="page-enter min-h-screen bg-transparent p-8">
+        <div className="surface mx-auto max-w-3xl p-6">
+          <h1 className="brand-heading text-2xl font-bold text-slate-900">Article not found.</h1>
           <button
             onClick={() => navigate("/public")}
-            className="mt-4 bg-slate-800 text-white px-4 py-2 rounded"
+            className="btn-primary mt-4"
           >
             Back to Home
           </button>
@@ -98,12 +66,12 @@ function PublicArticle() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100">
-      <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="page-enter min-h-screen bg-transparent">
+      <div className="shell max-w-6xl py-6">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <button
             onClick={() => navigate("/public")}
-            className="px-4 py-2 rounded bg-white border border-slate-300 text-slate-700"
+            className="btn-secondary"
           >
             Back to Home
           </button>
@@ -116,7 +84,7 @@ function PublicArticle() {
               id="article-language"
               value={activeCode}
               onChange={(e) => handleLanguageChange(e.target.value)}
-              className="border border-slate-300 rounded px-3 py-2 bg-white"
+              className="field"
             >
               {DIALECTS.map((dialect) => (
                 <option key={dialect.code} value={dialect.code}>
@@ -127,15 +95,48 @@ function PublicArticle() {
           </div>
         </div>
 
-        <article className="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-slate-500 mb-2">{article.category}</p>
-          <h1 className="text-3xl font-bold text-slate-900 mb-3">{content.title}</h1>
-          <p className="text-sm text-slate-500 mb-6">
-            {article.author} · {formatDate(article.publishedAt)} · {DIALECT_CODE_TO_LABEL[activeCode]}
-          </p>
+        <div className="grid gap-6 lg:grid-cols-12">
+          <article className="lg:col-span-8">
+            <div className="overflow-hidden rounded-2xl">
+              <img src={article.leadImage} alt={content.title} className="h-[380px] w-full object-cover" />
+            </div>
+            <div className="mt-5">
+              <p className="mb-2 text-xs uppercase tracking-wide text-purple-700">{article.category}</p>
+              <h1 className="brand-heading mb-3 text-5xl font-bold leading-tight text-slate-900">{content.title}</h1>
+              <p className="mb-5 text-sm text-slate-500">
+                {article.author} · {formatDate(article.publishedAt)} · {DIALECT_CODE_TO_LABEL[activeCode]}
+              </p>
+              <p className="mb-6 text-lg font-semibold text-slate-700">{article.summary}</p>
+              <p className="text-xl leading-9 text-slate-800 whitespace-pre-wrap">{content.body}</p>
+            </div>
+          </article>
 
-          <p className="text-lg leading-8 text-slate-800 whitespace-pre-wrap">{content.body}</p>
-        </article>
+          <aside className="lg:col-span-4">
+            <div className="surface p-4">
+              <h3 className="mb-4 border-l-4 border-purple-700 pl-2 text-lg font-bold uppercase tracking-wide text-slate-900">Related News</h3>
+              <div className="space-y-4">
+                {relatedStories.map((item) => {
+                  const fallbackCode = Object.keys(item.translations)[0];
+                  const itemCode = item.translations[selectedLanguage] ? selectedLanguage : fallbackCode;
+                  const itemContent = item.translations[itemCode];
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => navigate(`/public/article/${item.id}`)}
+                      className="flex w-full gap-3 border-b border-slate-200 pb-3 text-left last:border-b-0"
+                    >
+                      <img src={item.leadImage} alt={itemContent.title} className="h-16 w-20 rounded object-cover" />
+                      <div>
+                        <p className="text-[11px] font-semibold uppercase tracking-wide text-purple-700">{item.category}</p>
+                        <p className="text-sm font-semibold leading-snug text-slate-900 line-clamp-2">{itemContent.title}</p>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </aside>
+        </div>
       </div>
     </div>
   );

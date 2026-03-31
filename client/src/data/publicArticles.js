@@ -1,67 +1,126 @@
+function demoTranslations(title, body) {
+  return {
+    tl: { title, body },
+    ceb: { title: `[Cebuano] ${title}`, body },
+    ilo: { title: `[Ilocano] ${title}`, body },
+    hil: { title: `[Hiligaynon] ${title}`, body },
+    war: { title: `[Waray] ${title}`, body },
+    pam: { title: `[Kapampangan] ${title}`, body },
+  };
+}
+
 export const PUBLIC_ARTICLES = [
   {
-    id: "flood-update-001",
-    category: "Community",
-    author: "Paraluman Desk",
-    publishedAt: "2026-03-29T08:00:00.000Z",
-    translations: {
-      tl: {
-        title: "Inilatag ang mga Evacuation Center habang lumalala ang baha",
-        body: "Nagbukas ang lokal na pamahalaan ng karagdagang evacuation center at nagpadala ng rescue teams sa mga barangay na pinakamalubhang naapektuhan. Pinapayuhan ang mga residente na iwasan ang tumataas na tubig at sundin ang updates ng LGU.",
-      },
-      ceb: {
-        title: "Gipaandam ang mga Evacuation Center samtang nisamot ang baha",
-        body: "Nagbukas ang lokal nga gobyerno og dugang evacuation center ug nagpadala og rescue teams sa mga barangay nga grabe ang epekto. Giawhag ang mga residente nga likayan ang nisaka nga tubig ug sundon ang pahibalo sa LGU.",
-      },
-      ilo: {
-        title: "Naurnos dagiti Evacuation Center iti panag-atiddog ti layos",
-        body: "Naglukat ti lokal a gobyerno iti ad-adu pay nga evacuation center ken nagibaon ti rescue teams kadagiti barangay a nakaawat iti kangrunaan nga apektasion. Maikonsihar dagiti residente nga liklikan ti agngato nga danum ken suroten dagiti update ti LGU.",
-      },
-      hil: {
-        title: "Gin-andam ang mga Evacuation Center samtang naglala ang baha",
-        body: "Nagbukas ang lokal nga gobyerno sang dugang nga evacuation center kag nagpadala sang rescue teams sa mga barangay nga pinakagrabe ang epekto. Gina-agda ang mga residente nga likawan ang nagtakas nga tubig kag sundon ang updates sang LGU.",
-      },
-      war: {
-        title: "Gin-andam an mga Evacuation Center samtang nagtitiko hin baha",
-        body: "Nagbukas an lokal nga gobyerno hin dugang nga evacuation center ngan nagpadara hin rescue teams ha mga barangay nga pinakagrabe an epekto. Ginhahangyo an mga residente nga umiwas ha nagtitikahitaas nga tubig ngan sundon an updates han LGU.",
-      },
-      pam: {
-        title: "Mikayabe la reng Evacuation Center bayung lalong miglala ing baha",
-        body: "Mibukas ya ing lokal a gobyernu ning aduang evacuation center at mipadala yang rescue teams kareng barangay a masalese la reng apektadu. Makiusap la reng residente a iwasan ing aaslag a danum at sundan da reng updates ning LGU.",
-      },
-    },
+    id: "metro-transport-001",
+    category: "Top Story",
+    author: "Paraluman Newsroom",
+    publishedAt: "2026-03-31T09:20:00.000Z",
+    leadImage:
+      "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1600&q=80",
+    summary:
+      "Commuter volume climbed early this morning as provincial terminals reopened full operations before the holiday peak.",
+    translations: demoTranslations(
+      "Transport agencies brace for holiday surge as terminals reopen",
+      "National and local transport offices deployed additional marshals, rerouted buses, and synchronized dispatch schedules in Metro Manila as passenger traffic increased before Holy Week travel days. Officials said crowd-monitoring protocols will remain active until late evening to reduce bottlenecks and long queues."
+    ),
   },
   {
-    id: "health-drive-002",
+    id: "energy-watch-002",
+    category: "Business",
+    author: "Paraluman Business Desk",
+    publishedAt: "2026-03-31T07:50:00.000Z",
+    leadImage:
+      "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=1200&q=80",
+    summary:
+      "Grid operators announced reserve levels stayed manageable despite higher daytime demand.",
+    translations: demoTranslations(
+      "Power reserves hold steady despite hotter afternoon demand",
+      "Grid operators reported stable reserve margins across Luzon and Visayas, with standby units activated during peak hours. Energy planners said no red alerts were expected this week but advised large consumers to stagger heavy-load operations in the afternoon."
+    ),
+  },
+  {
+    id: "storm-monitor-003",
+    category: "Weather",
+    author: "Paraluman Weather Desk",
+    publishedAt: "2026-03-31T06:15:00.000Z",
+    leadImage:
+      "https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?auto=format&fit=crop&w=1200&q=80",
+    summary:
+      "Local governments in low-lying areas prepared contingency sites amid intermittent heavy rain.",
+    translations: demoTranslations(
+      "Authorities raise flood watch in seven riverside communities",
+      "Municipal disaster offices pre-positioned rescue boats and emergency packs as intermittent rain persisted overnight. Barangay coordinators were instructed to update household registries and prioritize evacuation support for children and senior residents."
+    ),
+  },
+  {
+    id: "health-drive-004",
     category: "Health",
-    author: "Paraluman Desk",
-    publishedAt: "2026-03-30T02:30:00.000Z",
-    translations: {
-      tl: {
-        title: "Libreng health screening para sa senior citizens ngayong linggo",
-        body: "Magsasagawa ang city health office ng libreng blood pressure at blood sugar screening sa tatlong health center ngayong linggo. Hinihikayat ang pamilya na samahan ang mga senior citizens para sa mas maayos na konsultasyon.",
-      },
-      ceb: {
-        title: "Libre nga health screening para sa senior citizens karong semanaha",
-        body: "Magpahigayon ang city health office og libreng blood pressure ug blood sugar screening sa tulo ka health center karong semanaha. Gina-awhag ang pamilya nga kuyogan ang mga senior citizens alang sa mas maayong konsultasyon.",
-      },
-      ilo: {
-        title: "Libre a health screening para kadagiti senior citizens ita a lawas",
-        body: "Mangidaulo ti city health office iti libre a blood pressure ken blood sugar screening iti tallo a health center ita a lawas. Maawis dagiti pamilya a mangibingay kadagiti senior citizens tapno nasaysayaat ti konsultasion.",
-      },
-      hil: {
-        title: "Libre nga health screening para sa senior citizens subong nga semana",
-        body: "Magapatigayon ang city health office sang libre nga blood pressure kag blood sugar screening sa tatlo ka health center subong nga semana. Gina-encourage ang pamilya nga updan ang mga senior citizens para sa mas maayo nga konsultasyon.",
-      },
-      war: {
-        title: "Libre nga health screening para han senior citizens hini nga semana",
-        body: "Maghihimo an city health office hin libre nga blood pressure ngan blood sugar screening ha tulo nga health center hini nga semana. Ginhahangyo an pamilya nga umupod ha mga senior citizens para han mas maopay nga konsultasyon.",
-      },
-      pam: {
-        title: "Libre yang health screening para kareng senior citizens ngening semana",
-        body: "Magsagawa ya ing city health office ning libre a blood pressure ampong blood sugar screening king atlung health center ngening semana. Makiusap ya kareng pamilya a sabayan da reng senior citizens para king mas maayus a konsultasyun.",
-      },
-    },
+    author: "Paraluman Health Desk",
+    publishedAt: "2026-03-30T15:05:00.000Z",
+    leadImage:
+      "https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=1200&q=80",
+    summary:
+      "A city-wide screening effort will open in three districts for walk-in consultations.",
+    translations: demoTranslations(
+      "Free blood pressure and sugar checks open in district clinics",
+      "The city health office launched a week-long preventive care campaign offering no-cost blood pressure and blood sugar checks. Organizers said walk-in slots would be prioritized for older adults and people with recurring symptoms."
+    ),
+  },
+  {
+    id: "campus-safety-005",
+    category: "Education",
+    author: "Paraluman Education Desk",
+    publishedAt: "2026-03-30T13:35:00.000Z",
+    leadImage:
+      "https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?auto=format&fit=crop&w=1200&q=80",
+    summary:
+      "School heads coordinated with police and social workers for post-incident counseling.",
+    translations: demoTranslations(
+      "Schools tighten gate checks and counseling support after incidents",
+      "Public and private schools in several cities updated entry controls and expanded student counseling schedules this week. Administrators said parent briefings and classroom advisories would continue while agencies complete risk assessments."
+    ),
+  },
+  {
+    id: "sports-finale-006",
+    category: "Sports",
+    author: "Paraluman Sports Desk",
+    publishedAt: "2026-03-30T10:40:00.000Z",
+    leadImage:
+      "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1200&q=80",
+    summary:
+      "The finals opener drew record live viewership with late-game momentum swings.",
+    translations: demoTranslations(
+      "Underdog squad stuns top seed in overtime finals opener",
+      "A defensive stop in the final seconds sent the championship opener into overtime, where the underdog lineup closed strong behind transition scoring. Coaches on both sides emphasized recovery and discipline ahead of Game Two."
+    ),
+  },
+  {
+    id: "culture-week-007",
+    category: "Lifestyle",
+    author: "Paraluman Lifestyle Desk",
+    publishedAt: "2026-03-29T16:30:00.000Z",
+    leadImage:
+      "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&w=1200&q=80",
+    summary:
+      "Regional artists and food makers are expected to headline this weekend's showcase.",
+    translations: demoTranslations(
+      "City to host weekend arts and food streets festival",
+      "Organizers announced a three-day cultural showcase featuring local musicians, visual artists, and community kitchens from surrounding provinces. Traffic managers will deploy rerouting plans near event corridors beginning Friday afternoon."
+    ),
+  },
+  {
+    id: "tech-rail-008",
+    category: "Technology",
+    author: "Paraluman Tech Desk",
+    publishedAt: "2026-03-29T11:55:00.000Z",
+    leadImage:
+      "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1200&q=80",
+    summary:
+      "Pilot testing starts next month to reduce turnaround time for rider dispatch.",
+    translations: demoTranslations(
+      "Smart rail pilot rolls out AI dispatch for station crowding",
+      "A pilot program for commuter analytics and dispatch timing will launch in selected stations next month. Officials said the system will predict queue surges and trigger platform staffing plans in real time."
+    ),
   },
 ];
 
