@@ -111,7 +111,7 @@ function PublicHome() {
                 <div className="absolute bottom-0 p-6 text-white">
                   <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-purple-200">{featuredStory.category}</p>
                   <h2 className="brand-heading mb-2 max-w-3xl text-4xl font-bold leading-tight">{featuredStory.content.title}</h2>
-                  <p className="max-w-2xl text-sm text-slate-200">{featuredStory.summary}</p>
+                  <p className="max-w-2xl text-sm text-slate-200">{featuredStory.content.summary}</p>
                   <p className="mt-3 text-xs text-slate-300">{featuredStory.author} · {formatDate(featuredStory.publishedAt)}</p>
                 </div>
               </article>
