@@ -1,5 +1,9 @@
 const cache = new Map();
 const MAX_CHARS_PER_REQUEST = 450;
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({model: "gemini-1.5-flash"});
 
 const SUPPORTED_LANGUAGES = {
     tl: { label: "Tagalog", myMemoryCode: "tl" },
@@ -66,7 +70,27 @@ async function translateWithMyMemory(text, sourceLang, targetLang) {
     return translated;
 }
 
-async function translateText({ text, sourceLanguage = "en", targetLanguage }) {
+async function translateWithGeminiPrompt(text, sourceLang, targetLang) {
+    try {
+        const prompt = `Translate the following ${sourceLang} text to ${targetLang.label}. 
+                        Provide ONLY the translated text without quotes or explanations: 
+                        "${text}"`;
+        const result = await model.generateContent(prompt);
+        const response = result.text().trim();
+        const translatedText = response.text().trim();
+
+        if (!translatedText) {
+            throw new Error("Gemini returned empty translation");
+        }
+
+        return translateText;
+    } catch (error) {
+        console.error("Gemini Error: ", error.message);
+        throw new Error(`Gemini Failed: ${error.message}`);
+    }
+}
+
+async function translateText({ text, sourceLanguage = "English", targetLanguage }) {
     if (!text || !text.trim()) {
         return text;
     }
@@ -103,7 +127,7 @@ async function translateText({ text, sourceLanguage = "en", targetLanguage }) {
                 continue;
             }
             // translate the chunk and store it in the cache, jic the same chunk appears again
-            const translatedChunk = await translateWithMyMemory(chunk, source, target.myMemoryCode);
+            const translatedChunk = await translateWithGeminiPrompt(chunk, source, target.label);
             cache.set(chunkKey, translatedChunk);
 
             // push to translated array
