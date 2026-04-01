@@ -85,8 +85,8 @@ function NewArticle() {
   }
 
   function handleSaveDraft() {
-    if (!title.trim() || !body.trim()) {
-      alert("Please provide both title and body before saving as draft.");
+    if (!title.trim()) {
+      alert("Please provide a title before saving as draft.");
       return;
     }
 
