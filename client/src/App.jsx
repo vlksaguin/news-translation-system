@@ -8,6 +8,7 @@ import ReviewArticle from "./pages/ReviewArticle";
 import EditArticle from "./pages/EditArticle";
 import PublicHome from "./pages/PublicHome";
 import PublicArticle from "./pages/PublicArticle";
+import PreviewArticle from "./pages/PreviewArticle";
 import Navbar from "./components/Navbar";
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
         <Route path="/new" element={<NewArticle />} />
         <Route path="/review" element={<ReviewArticle />} />
         <Route path="/edit" element={<EditArticle />} />
+        <Route path="/preview/:articleId" element={<PreviewArticle />} />
         <Route path="/public" element={<PublicHome />} />
         <Route path="/public/article/:articleId" element={<PublicArticle />} />
       </Routes>
