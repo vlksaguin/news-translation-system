@@ -16,6 +16,7 @@ function NewArticle() {
   const [isTranslating, setIsTranslating] = useState(false);
   const [editingDraftId, setEditingDraftId] = useState(null);
   const [translationProgress, setTranslationProgress] = useState({});
+  const TARGET_DIALECTS = DIALECTS.filter((dialect) => dialect.code !== "en");
 
   const navigate = useNavigate();
 
@@ -114,7 +115,7 @@ function NewArticle() {
 
     // Set all to pending initially
     const initialProgress = Object.fromEntries(
-      DIALECTS.map((d) => [d.code, "pending"])
+      TARGET_DIALECTS.map((d) => [d.code, "pending"])
     );
     setTranslationProgress(initialProgress);
 
@@ -122,7 +123,7 @@ function NewArticle() {
       const baseArticle = buildBaseArticle("for_review");
       const translations = {};
 
-      for (const dialect of DIALECTS) {
+      for (const dialect of TARGET_DIALECTS) {
         // 1. Update status to "translating" for this specific dialect
         setTranslationProgress(prev => ({ ...prev, [dialect.code]: "translating" }));
 
@@ -235,11 +236,11 @@ function NewArticle() {
           </form>
 
           <div className="mt-6 text-sm text-slate-600">
-            <p>Save as Draft stores English only. Translate generates all 6 dialects and opens review.</p>
+            <p>Save as Draft stores English only. Translate generates 6 Philippine dialects and opens review.</p>
           </div>
 
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            {DIALECTS.map((dialect) => {
+            {TARGET_DIALECTS.map((dialect) => {
               const status = translationProgress[dialect.code] || "pending";
 
               // Logic for subtle status colors

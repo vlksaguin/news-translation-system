@@ -23,6 +23,7 @@ function ReviewArticle() {
   const [isSaving, setIsSaving] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [validationMessage, setValidationMessage] = useState("");
+  const TARGET_DIALECTS = DIALECTS.filter((dialect) => dialect.code !== "en");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -54,7 +55,7 @@ function ReviewArticle() {
   async function generateTranslations(baseArticle) {
     setIsGeneratingTranslations(true);
     try {
-      const targetLanguages = DIALECTS.map((dialect) => dialect.code);
+      const targetLanguages = TARGET_DIALECTS.map((dialect) => dialect.code);
       const title = baseArticle.source.title;
       const body = baseArticle.source.body;
 
@@ -104,7 +105,7 @@ function ReviewArticle() {
       );
 
       const translations = {};
-      for (const dialect of DIALECTS) {
+      for (const dialect of TARGET_DIALECTS) {
         const titleResult = titleResultMap[dialect.code];
         const bodyResult = bodyResultMap[dialect.code];
         const isSuccess = Boolean(titleResult?.ok) && Boolean(bodyResult?.ok);
@@ -151,7 +152,7 @@ function ReviewArticle() {
       return false;
     }
 
-    return DIALECTS.every((dialect) => article.translations[dialect.code]?.reviewStatus === "approved");
+    return TARGET_DIALECTS.every((dialect) => article.translations[dialect.code]?.reviewStatus === "approved");
   }, [article]);
 
   function updateSelectedTranslation(field, value) {
@@ -257,7 +258,9 @@ function ReviewArticle() {
         sourceArticleId: id,
       };
 
-      const translatedArticles = Object.entries(article.translations || {}).map(([code, translation]) => ({
+      const translatedArticles = Object.entries(article.translations || {})
+        .filter(([code]) => code !== "en")
+        .map(([code, translation]) => ({
         id: `${id}_${code}`,
         title: translation.title,
         body: translation.body,
@@ -359,7 +362,7 @@ function ReviewArticle() {
         )}
 
         <div className="mb-4 flex flex-wrap gap-2">
-          {DIALECTS.filter((dialect) => article.translations?.[dialect.code]).map((dialect) => (
+          {TARGET_DIALECTS.filter((dialect) => article.translations?.[dialect.code]).map((dialect) => (
             <button
               key={dialect.code}
               onClick={() => setSelectedLanguage(dialect.code)}
