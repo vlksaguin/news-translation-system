@@ -106,8 +106,8 @@ function NewArticle() {
   async function handleTranslate(e) {
     e.preventDefault();
 
-    if (!title.trim() || !body.trim()) {
-      alert("Please provide both title and body before translating.");
+    if (!title.trim() || !body.trim() || !author.trim()) {
+      alert("Please provide both title, body and author before translating.");
       return;
     }
 
