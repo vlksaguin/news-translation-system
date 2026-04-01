@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { DIALECTS, DIALECT_CODE_TO_LABEL } from "../constants/languages";
 import { PUBLIC_ARTICLES, PUBLIC_LANGUAGE_STORAGE_KEY } from "../data/publicArticles";
 
-const DEFAULT_LANGUAGE = "en";
+const DEFAULT_LANGUAGE = "tl";
 
 function formatDate(value) {
   const date = new Date(value);

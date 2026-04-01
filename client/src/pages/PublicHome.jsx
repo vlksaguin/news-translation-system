@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { DIALECTS } from "../constants/languages";
 import { PUBLIC_ARTICLES, PUBLIC_LANGUAGE_STORAGE_KEY } from "../data/publicArticles";
 
-const DEFAULT_LANGUAGE = "en";
+const DEFAULT_LANGUAGE = "tl";
 const HOME_CATEGORIES = ["Latest News", "Politics", "Business", "Technology", "Health", "Sports", "Lifestyle"];
 
 function formatDate(value) {
