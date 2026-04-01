@@ -82,13 +82,19 @@ async function translateWithGeminiPrompt(text, sourceLang, targetLang) {
             contents: [{
                 role: 'user',
                 parts: [{
-                    text: `You are a Philippine Dialect Expert, knowledgable about the different grammar rules and vocabulary of various Philippine Dialects.
-                    Translate the following ${sourceLang} text to ${targetLang}. Provide ONLY the translated text, with no other explanations: "${text}"`
+                    text: `You are a Philippine Dialect Expert, knowledgeable about the different grammar rules and vocabulary of various Philippine Dialects.
+                    Translate "${text}" from ${sourceLang} to ${targetLang}. Response must be only the translated text, no quotes around it, no explanation.`
                 }]
             }]
         });
 
-        const translatedText = response.text;
+        let translatedText = response.text.trim();
+
+        // Remove surrounding quotes if present
+        if ((translatedText.startsWith('"') && translatedText.endsWith('"')) ||
+            (translatedText.startsWith("'") && translatedText.endsWith("'"))) {
+            translatedText = translatedText.slice(1, -1);
+        }
 
         if (!translatedText) {
             throw new Error("Gemini returned empty translation");
@@ -111,14 +117,20 @@ async function translateWithOpenAIPrompt(text, sourceLang, targetLang) {
                 },
                 {
                     role: "user",
-                    content: `Translate the following ${sourceLang} text to ${targetLang}. Provide ONLY the translated text, with no other explanations: "${text}"`
+                    content: `Translate "${text}" from ${sourceLang} to ${targetLang}. Response must be only the translated text, no quotes around it, no explanation.`
                 }
             ],
             temperature: 0.3,
             max_tokens: 5000,
         });
 
-        const translatedText = response.choices[0].message.content;
+        let translatedText = response.choices[0].message.content.trim();
+
+        // Remove surrounding quotes if present
+        if ((translatedText.startsWith('"') && translatedText.endsWith('"')) ||
+            (translatedText.startsWith("'") && translatedText.endsWith("'"))) {
+            translatedText = translatedText.slice(1, -1);
+        }
 
         if (!translatedText) {
             throw new Error("OpenAI returned empty translation");
