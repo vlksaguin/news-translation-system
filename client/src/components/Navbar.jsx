@@ -21,12 +21,12 @@ function Navbar() {
           >
             Editor
           </button>
-          {/* <button
+          <button
             onClick={() => navigate("/public")}
             className="rounded-full border border-white/40 bg-white/10 px-4 py-1.5 hover:bg-white/20"
           >
             Public Demo
-          </button> */}
+          </button>
         </div>
       </div>
     </div>
