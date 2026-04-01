@@ -61,7 +61,7 @@ function PublicHome() {
             <span>{new Date().toLocaleDateString()}</span>
             <span>Paraluman News Network</span>
           </div>
-          <div className="mb-3 flex items-center justify-between gap-3">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
             <h1 className="brand-heading text-5xl font-bold text-purple-800">paraluman.</h1>
             <div className="flex items-center gap-2">
               <label htmlFor="public-language" className="text-sm font-medium text-slate-700">
@@ -71,7 +71,7 @@ function PublicHome() {
                 id="public-language"
                 value={selectedLanguage}
                 onChange={(e) => handleLanguageChange(e.target.value)}
-                className="field min-w-[180px]"
+                className="field max-w-[180px] text-sm max-h-10"
               >
                 {DIALECTS.map((dialect) => (
                   <option key={dialect.code} value={dialect.code}>
@@ -110,8 +110,8 @@ function PublicHome() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
                 <div className="absolute bottom-0 p-6 text-white">
                   <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-purple-200">{featuredStory.category}</p>
-                  <h2 className="brand-heading mb-2 max-w-3xl text-4xl font-bold leading-tight">{featuredStory.content.title}</h2>
-                  <p className="max-w-2xl text-sm text-slate-200">{featuredStory.content.summary}</p>
+                  <h2 className="brand-heading mb-2 max-w-3xl md:text-4xl text-2xl font-bold leading-tight">{featuredStory.content.title}</h2>
+                  <p className="max-w-2xl md:text-sm text-xs text-slate-200">{featuredStory.content.summary}</p>
                   <p className="mt-3 text-xs text-slate-300">{featuredStory.author} · {formatDate(featuredStory.publishedAt)}</p>
                 </div>
               </article>
