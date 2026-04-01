@@ -86,7 +86,7 @@ function PublicArticle() {
               id="article-language"
               value={activeCode}
               onChange={(e) => handleLanguageChange(e.target.value)}
-                className="field max-w-[140px] text-sm max-h-10"
+                className="field max-w-[140px] text-sm max-h-11"
             >
               {DIALECTS.map((dialect) => (
                 <option key={dialect.code} value={dialect.code}>
