@@ -33,6 +33,7 @@ function Dashboard() {
   const [allArticles, setAllArticles] = useState([]);
   const [activeFilter, setActiveFilter] = useState("all");
   const navigate = useNavigate();
+  const PREVIEW_STORAGE_KEY = "previewArticle";
 
   useEffect(() => {
     // Load from both articles (drafts) and published
@@ -101,6 +102,19 @@ function Dashboard() {
       localStorage.setItem("currArticle", JSON.stringify(article));
       localStorage.removeItem("editArticle");
       navigate("/review");
+      return;
+    }
+
+    if (article.status === "published") {
+      const sourceId = article.sourceArticleId || article.id?.split("_")[0] || article.id;
+      localStorage.setItem(
+        PREVIEW_STORAGE_KEY,
+        JSON.stringify({
+          sourceId,
+          status: "published",
+        })
+      );
+      navigate(`/preview/${sourceId}`);
       return;
     }
 
