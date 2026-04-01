@@ -86,7 +86,7 @@ function PublicArticle() {
               id="article-language"
               value={activeCode}
               onChange={(e) => handleLanguageChange(e.target.value)}
-              className="field"
+                className="field max-w-[140px] text-sm max-h-10"
             >
               {DIALECTS.map((dialect) => (
                 <option key={dialect.code} value={dialect.code}>
@@ -104,12 +104,12 @@ function PublicArticle() {
             </div>
             <div className="mt-5">
               <p className="mb-2 text-xs uppercase tracking-wide text-purple-700">{article.category}</p>
-              <h1 className="brand-heading mb-3 text-5xl font-bold leading-tight text-slate-900">{content.title}</h1>
-              <p className="mb-5 text-sm text-slate-500">
+              <h1 className="brand-heading mb-3 md:text-5xl text-4xl font-bold leading-tight text-slate-900">{content.title}</h1>
+              <p className="mb-5 md:text-sm text-xs text-slate-500">
                 {article.author} · {formatDate(article.publishedAt)} · {DIALECT_CODE_TO_LABEL[activeCode]}
               </p>
               <p className="mb-6 text-lg font-semibold text-slate-700">{content.summary}</p>
-              <p className="text-xl leading-9 text-slate-800 whitespace-pre-wrap">{content.body}</p>
+              <p className="md:text-xl text-lg leading-9 text-slate-800 whitespace-pre-wrap">{content.body}</p>
             </div>
           </article>
 
