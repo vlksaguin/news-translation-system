@@ -45,7 +45,7 @@ function ArticleCard({ article, status, onClick }) {
       ? "Edit Article"
       : status === "for_review"
       ? "Edit Translations"
-      : "View Article";
+      : "Preview Article";
 
   // For draft articles, show source title/body
   const displayTitle = article.source?.title || article.title || "Untitled";
