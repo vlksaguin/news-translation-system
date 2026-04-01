@@ -1,11 +1,13 @@
 const cache = new Map();
 const MAX_CHARS_PER_REQUEST = 3000;
 const { GoogleGenAI } = require("@google/genai");
+const { OpenAI } = require("openai");
+
 require('dotenv').config({ quiet: true });
 // console.log(process.env.GEMINI_API_KEY);
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
+const openAI = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 const SUPPORTED_LANGUAGES = {
@@ -98,6 +100,38 @@ async function translateWithGeminiPrompt(text, sourceLang, targetLang) {
         throw new Error(`Gemini Failed: ${error.message}`);
     }
 }
+async function translateWithOpenAIPrompt(text, sourceLang, targetLang) {
+    try {
+        const response = await openAI.chat.completions.create({
+            model: 'gpt-4o',
+            messages: [
+                {
+                    role: "system",
+                    content: "You are a Philippine Dialect Expert knowledgeable about the grammar rules and vocabulary of various Philippine Dialects."
+                },
+                {
+                    role: "user",
+                    content: `Translate the following ${sourceLang} text to ${targetLang}. Provide ONLY the translated text, with no other explanations: "${text}"`
+                }
+            ],
+            temperature: 0.3,
+            max_tokens: 5000,
+        });
+
+        const translatedText = response.choices[0].message.content;
+
+        if (!translatedText) {
+            throw new Error("OpenAI returned empty translation");
+        }
+
+        return translatedText;
+    } catch (error) {
+        console.error("OpenAI Error: ", error.message);
+        throw new Error(`OpenAI Failed: ${error.message}`);
+    }
+}
+
+
 
 async function translateText({ text, sourceLanguage = "English", targetLanguage }) {
     if (!text || !text.trim()) {
@@ -120,47 +154,30 @@ async function translateText({ text, sourceLanguage = "English", targetLanguage 
     }
 
     try {
-        await sleep(10000);
-        // --- STEP 1: Attempt full translation with Gemini ---
-        console.log("Attempting full translation with Gemini...");
-        const translated = await translateWithGeminiPrompt(text, source, target.label);
-        
+        // Attempt 1: OpenAI
+        console.log("Attempting OpenAI...");
+        await sleep(2000); 
+        const translated = await translateWithOpenAIPrompt(text, source, target.label);
         cache.set(cacheKey, translated);
         return translated;
 
-    } catch (geminiError) {
-        // --- STEP 2: Fallback to Chunked MyMemory ---
-        console.warn("Gemini failed (Quota/Error). Falling back to Chunked MyMemory...");
+    } catch (openAIError) {
+        console.warn("OpenAI failed, attempting Gemini...");
         
-        // Use your existing chunking logic specifically for MyMemory's 500-char limit
-        const chunks = splitIntoChunks(text, 450); 
-        const translatedParts = [];
-
-        for (const chunk of chunks) {
-            if (!chunk.trim()) {
-                translatedParts.push(chunk);
-                continue;
-            }
-
-            const chunkKey = `${source}|${target.myMemoryCode}|${chunk}`;
-            if (cache.has(chunkKey)) {
-                translatedParts.push(cache.get(chunkKey));
-                continue;
-            }
-
-            // Small delay to prevent hitting MyMemory's rate limits too
+        try {
+            // Attempt 2: Gemini
             await sleep(5000);
+            const translated = await translateWithGeminiPrompt(text, source, target.label);
+            cache.set(cacheKey, translated);
+            return translated;
 
-            const sourceCode = source === "English" ? "en" : source;
-            const translatedChunk = await translateWithMyMemory(chunk, sourceCode, target.myMemoryCode);
-            
-            cache.set(chunkKey, translatedChunk);
-            translatedParts.push(translatedChunk);
+        } catch (geminiError) {
+            // Attempt 3: MyMemory (Final Fallback)
+            console.warn("Gemini failed, falling back to MyMemory...");
+            const finalTranslation = await handleMyMemoryFallback(text, source, target);
+            cache.set(cacheKey, finalTranslation);
+            return finalTranslation;
         }
-
-        const finalTranslation = translatedParts.join("");
-        cache.set(cacheKey, finalTranslation);
-        return finalTranslation;
     }
 }
 
