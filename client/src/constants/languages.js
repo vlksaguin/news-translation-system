@@ -1,4 +1,5 @@
 export const DIALECTS = [
+  { code: "en", label: "English" },
   { code: "tl", label: "Tagalog" },
   { code: "ceb", label: "Cebuano" },
   { code: "ilo", label: "Ilocano" },
