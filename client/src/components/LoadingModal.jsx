@@ -13,7 +13,7 @@ function LoadingModal({ isOpen, message }) {
       aria-label="Translation n progress"
     >
       <div className="w-[90%] max-w-sm rounded-xl bg-white p-6 text-center shadow-2xl">
-        <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-gray-300 border-t-purple-700" />
+        <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-gray-300 border-t-[#9D0759]" />
         <h2 className="mb-2 text-lg font-semibold text-gray-900">Please wait</h2>
         <p className="text-sm text-gray-600">{message}</p>
       </div>

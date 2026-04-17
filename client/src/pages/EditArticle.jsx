@@ -405,7 +405,7 @@ function EditArticle() {
               key={dialect}
               onClick={() => setSelectedLanguage(dialect)}
               className={`px-3 py-2 text-sm rounded ${
-                selectedLanguage === dialect ? "bg-purple-700 text-white" : "bg-white border"
+                selectedLanguage === dialect ? "bg-[#9D0759] text-white" : "bg-white border-[#f8c9e1]"
               }`}
             >
               <span className="inline-flex items-center gap-2">
@@ -498,7 +498,7 @@ function EditArticle() {
           <button
             onClick={handleSaveEdits}
             disabled={isSaving || isRetranslating}
-            className="bg-purple-700 text-white px-6 py-2"
+            className="bg-[#9D0759] text-white px-6 py-2"
           >
             {isSaving || isRetranslating ? "Saving..." : "Save Edits"}
           </button>

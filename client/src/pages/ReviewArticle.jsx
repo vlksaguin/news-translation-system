@@ -352,7 +352,7 @@ function ReviewArticle() {
       <div className="shell py-6">
         <section className="news-hero mb-5 p-6">
           <h1 className="brand-heading mb-2 text-3xl font-bold text-slate-900">Review Translations</h1>
-          <p className="text-sm text-slate-600">Status: <span className="font-semibold text-purple-800">For Checking / For Review</span></p>
+          <p className="text-sm text-slate-600">Status: <span className="font-semibold text-[#9D0759]">For Checking / For Review</span></p>
         </section>
 
         {validationMessage && (

@@ -23,8 +23,8 @@ function LoginPage() {
       <LoadingModal isOpen={isLoggingIn} message="Signing you in..." />
       <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-[1.2fr_0.8fr]">
         <section className="news-hero p-7 md:p-10">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-purple-700">Editorial Control Center</p>
-          <h1 className="brand-heading mb-4 text-4xl font-bold text-slate-900">Paraluman News Translation Desk</h1>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#9D0759]">Editorial Control Center</p>
+          <h1 className="brand-heading mb-4 text-4xl font-bold text-slate-900">Balita News Translation Desk</h1>
           <p className="max-w-2xl text-base text-slate-700">
             Prepare source stories, coordinate multilingual reviews, and publish reader-ready coverage with a newsroom workflow inspired by modern media dashboards.
           </p>
@@ -45,7 +45,7 @@ function LoginPage() {
         </section>
 
         <form onSubmit={handleLogin} className="surface p-7 md:p-8">
-          <h2 className="brand-heading mb-1 text-2xl font-bold text-purple-900">Editor Sign In</h2>
+          <h2 className="brand-heading mb-1 text-2xl font-bold text-[#9D0759]">Editor Sign In</h2>
           <p className="mb-5 text-sm text-slate-600">Validation is coming next phase. Use any credentials for now.</p>
 
           <input

@@ -162,7 +162,7 @@ function PreviewArticle() {
         <div className="grid gap-6 lg:grid-cols-12">
           <article className="lg:col-span-8">
             <div className="mt-5">
-              <p className="mb-2 text-xs uppercase tracking-wide text-purple-700">{article.category}</p>
+              <p className="mb-2 text-xs uppercase tracking-wide text-[#9D0759]">{article.category}</p>
               <h1 className="brand-heading mb-3 md:text-5xl text-4xl font-bold leading-tight text-slate-900">{content.title}</h1>
               <p className="mb-5 md:text-sm text-xs text-slate-500">
                 {article.author} · {formatDate(article.publishedAt)} · {DIALECT_CODE_TO_LABEL[activeCode]}

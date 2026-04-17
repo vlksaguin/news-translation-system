@@ -56,7 +56,7 @@ function ArticleCard({ article, status, onClick }) {
       className="surface cursor-pointer overflow-hidden transition hover:-translate-y-0.5 hover:shadow-xl"
       onClick={onClick}
     >
-      <div className="border-b border-purple-100 bg-gradient-to-r from-purple-50 to-white px-4 py-2 text-xs font-semibold uppercase tracking-wide text-purple-700">
+      <div className="border-b border-[#f8c9e1] bg-gradient-to-r from-[#fff2f8] to-white px-4 py-2 text-xs font-semibold uppercase tracking-wide text-[#9D0759]">
         Editorial Item
       </div>
       <div className="p-4">

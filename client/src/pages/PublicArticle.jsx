@@ -103,7 +103,7 @@ function PublicArticle() {
               <img src={article.leadImage} alt={content.title} className="h-[380px] w-full object-cover" />
             </div>
             <div className="mt-5">
-              <p className="mb-2 text-xs uppercase tracking-wide text-purple-700">{article.category}</p>
+              <p className="mb-2 text-xs uppercase tracking-wide text-[#9D0759]">{article.category}</p>
               <h1 className="brand-heading mb-3 md:text-5xl text-4xl font-bold leading-tight text-slate-900">{content.title}</h1>
               <p className="mb-5 md:text-sm text-xs text-slate-500">
                 {article.author} · {formatDate(article.publishedAt)} · {DIALECT_CODE_TO_LABEL[activeCode]}
@@ -115,7 +115,7 @@ function PublicArticle() {
 
           <aside className="lg:col-span-4">
             <div className="surface p-4">
-              <h3 className="mb-4 border-l-4 border-purple-700 pl-2 text-lg font-bold uppercase tracking-wide text-slate-900">Related News</h3>
+              <h3 className="mb-4 border-l-4 border-[#9D0759] pl-2 text-lg font-bold uppercase tracking-wide text-[#7f0448]">Related News</h3>
               <div className="space-y-4">
                 {relatedStories.map((item) => {
                   const fallbackCode = Object.keys(item.translations)[0];
@@ -129,8 +129,8 @@ function PublicArticle() {
                     >
                       <img src={item.leadImage} alt={itemContent.title} className="h-16 w-20 rounded object-cover" />
                       <div>
-                        <p className="text-[11px] font-semibold uppercase tracking-wide text-purple-700">{item.category}</p>
-                        <p className="text-sm font-semibold leading-snug text-slate-900 line-clamp-2">{itemContent.title}</p>
+                        <p className="text-[11px] font-semibold uppercase tracking-wide text-[#9D0759]">{item.category}</p>
+                        <p className="text-sm font-semibold leading-snug text-[#5e0335] line-clamp-2">{itemContent.title}</p>
                       </div>
                     </button>
                   );

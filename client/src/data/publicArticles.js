@@ -2,7 +2,7 @@ export const PUBLIC_ARTICLES = [
   {
     id: "metro-transport-001",
     category: "Top Story",
-    author: "Paraluman Newsroom",
+    author: "Balita Newsroom",
     publishedAt: "2026-03-31T09:20:00.000Z",
     leadImage: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1600&q=80",
     summary: "Commuter volume climbed early this morning as provincial terminals reopened full operations before the holiday peak.",
@@ -48,7 +48,7 @@ export const PUBLIC_ARTICLES = [
   {
     id: "energy-watch-002",
     category: "Business",
-    author: "Paraluman Business Desk",
+    author: "Balita Business Desk",
     publishedAt: "2026-03-31T07:50:00.000Z",
     leadImage: "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=1200&q=80",
     summary: "Grid operators announced reserve levels stayed manageable despite higher daytime demand.",
@@ -94,7 +94,7 @@ export const PUBLIC_ARTICLES = [
   {
     id: "storm-monitor-003",
     category: "Weather",
-    author: "Paraluman Weather Desk",
+    author: "Balita Weather Desk",
     publishedAt: "2026-03-31T06:15:00.000Z",
     leadImage: "https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?auto=format&fit=crop&w=1200&q=80",
     summary: "Local governments in low-lying areas prepared contingency sites amid intermittent heavy rain.",
@@ -120,7 +120,7 @@ export const PUBLIC_ARTICLES = [
   {
     id: "health-drive-004",
     category: "Health",
-    author: "Paraluman Health Desk",
+    author: "Balita Health Desk",
     publishedAt: "2026-03-30T15:05:00.000Z",
     leadImage: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=1200&q=80",
     summary: "A city-wide screening effort will open in three districts for walk-in consultations.",
@@ -142,7 +142,7 @@ export const PUBLIC_ARTICLES = [
   {
     id: "campus-safety-005",
     category: "Education",
-    author: "Paraluman Education Desk",
+    author: "Balita Education Desk",
     publishedAt: "2026-03-30T13:35:00.000Z",
     leadImage: "https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?auto=format&fit=crop&w=1200&q=80",
     summary: "School heads coordinated with police and social workers for post-incident counseling.",
@@ -164,7 +164,7 @@ export const PUBLIC_ARTICLES = [
   {
     id: "sports-finale-006",
     category: "Sports",
-    author: "Paraluman Sports Desk",
+    author: "Balita Sports Desk",
     publishedAt: "2026-03-30T10:40:00.000Z",
     leadImage: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1200&q=80",
     summary: "The finals opener drew record live viewership with late-game momentum swings.",
@@ -186,7 +186,7 @@ export const PUBLIC_ARTICLES = [
   {
     id: "culture-week-007",
     category: "Lifestyle",
-    author: "Paraluman Lifestyle Desk",
+    author: "Balita Lifestyle Desk",
     publishedAt: "2026-03-29T16:30:00.000Z",
     leadImage: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&w=1200&q=80",
     summary: "Regional artists and food makers are expected to headline this weekend's showcase.",
@@ -208,7 +208,7 @@ export const PUBLIC_ARTICLES = [
   {
     id: "tech-rail-008",
     category: "Technology",
-    author: "Paraluman Tech Desk",
+    author: "Balita Tech Desk",
     publishedAt: "2026-03-29T11:55:00.000Z",
     leadImage: "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1200&q=80",
     summary: "Pilot testing starts next month to reduce turnaround time for rider dispatch.",
